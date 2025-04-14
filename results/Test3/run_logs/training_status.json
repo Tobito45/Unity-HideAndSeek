@@ -1,0 +1,51 @@
+{
+    "My Behavior": {
+        "checkpoints": [
+            {
+                "steps": 240672,
+                "file_path": "results\\Test3\\My Behavior\\My Behavior-240672.onnx",
+                "reward": 1.0,
+                "creation_time": 1742948834.1752558,
+                "auxillary_file_paths": [
+                    "results\\Test3\\My Behavior\\My Behavior-240672.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 240672,
+            "file_path": "results\\Test3\\My Behavior.onnx",
+            "reward": 1.0,
+            "creation_time": 1742948834.1752558,
+            "auxillary_file_paths": [
+                "results\\Test3\\My Behavior\\My Behavior-240672.pt"
+            ]
+        }
+    },
+    "MoveToGoal": {
+        "checkpoints": [
+            {
+                "steps": 12656,
+                "file_path": "results\\Test3\\MoveToGoal\\MoveToGoal-12656.onnx",
+                "reward": 0.0,
+                "creation_time": 1742948834.266818,
+                "auxillary_file_paths": [
+                    "results\\Test3\\MoveToGoal\\MoveToGoal-12656.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 12656,
+            "file_path": "results\\Test3\\MoveToGoal.onnx",
+            "reward": 0.0,
+            "creation_time": 1742948834.266818,
+            "auxillary_file_paths": [
+                "results\\Test3\\MoveToGoal\\MoveToGoal-12656.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cu121"
+    }
+}
