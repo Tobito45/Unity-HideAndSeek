@@ -20,38 +20,58 @@ public class AgentFirst : Agent
     private float rotationSpeed = 60f;
 
     [SerializeField]
-    private float viewRadius = 5f;
+    private float viewGetRadius = 5f;
     [SerializeField]
     [Range(0, 360)]
-    private float viewAngle = 90f;
+    private float viewGetAngle = 90f;
     [SerializeField]
     private LayerMask obstacleMask;
     [SerializeField]
     public int rayCount = 50;
 
-    private Mesh meshArea;
     [SerializeField]
-    private MeshFilter meshFilterArea;
+    private float viewSeeRadius = 10f;
+    [SerializeField]
+    [Range(0, 360)]
+    private float viewSeeAngle = 90f;
+
+    private Mesh meshAreaGet, meshAreaSee;
+    [SerializeField]
+    private MeshFilter meshFilterAreaGet, meshFilterAreaSee;
+
+
+    private Vector3? lastSeenTargetPosition = null;
+    private bool hasGivenSightReward = false;
+    private float forgetTime = 5f;
+    private float lastSeenTime = -10f;
 
     private void Start()
     {
-        meshArea = new Mesh();
-        meshArea.name = "View Mesh";
-       // meshFilterArea = GetComponent<MeshFilter>();
-        meshFilterArea.mesh = meshArea;
+        meshAreaGet = new Mesh();
+        meshAreaGet.name = "View Mesh Get";
+        meshFilterAreaGet.mesh = meshAreaGet;
+
+        meshAreaSee = new Mesh();
+        meshAreaSee.name = "View Mesh See";
+        meshFilterAreaSee.mesh = meshAreaSee;
     }
 
     public override void OnEpisodeBegin()
     {
         transform.localPosition = new Vector3(0, 0.26f * 3, 0);
-        transform.rotation = Quaternion.identity;
+        lastSeenTargetPosition = null;
+        transform.localRotation = Quaternion.identity;
         targetPosition.localPosition = GetRandomPositionInCircle((floorMeshRender.gameObject.transform.localScale.x - 0.5f) / 2);
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
         sensor.AddObservation(transform.localPosition);
-        sensor.AddObservation(targetPosition.localPosition);
+
+        if (lastSeenTargetPosition.HasValue)
+            sensor.AddObservation(lastSeenTargetPosition.Value);
+        else
+            sensor.AddObservation(Vector3.zero);
     }
 
 
@@ -63,14 +83,31 @@ public class AgentFirst : Agent
         float rotationY = actions.ContinuousActions[2];
 
         transform.localPosition += new Vector3(moveX, 0, moveZ) * Time.deltaTime * moveSpeed;
-
         transform.Rotate(Vector3.up, rotationY * rotationSpeed * Time.deltaTime);
 
         if (CanSeeTarget())
         {
+            lastSeenTargetPosition = targetPosition.localPosition;
+            lastSeenTime = Time.time;
+
+            if (!hasGivenSightReward)
+            {
+                SetReward(0.1f);
+                hasGivenSightReward = true;
+            }
+        }
+
+        if (lastSeenTargetPosition.HasValue && CanGetTarget())
+        {
             SetReward(1f);
             EndEpisode();
             floorMeshRender.material = winMat;
+        }
+
+        if (hasGivenSightReward && Time.time - lastSeenTime > forgetTime)
+        {
+            lastSeenTargetPosition = null;
+            hasGivenSightReward = false;
         }
     }
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -85,9 +122,9 @@ public class AgentFirst : Agent
     {
         if (other.tag == "Goal")
         {
-            SetReward(1f);
-            EndEpisode();
-            floorMeshRender.material = winMat;
+            //SetReward(1f);
+            //EndEpisode();
+            //floorMeshRender.material = winMat;
         }
 
         if (other.tag == "Wall")
@@ -100,10 +137,11 @@ public class AgentFirst : Agent
 
     private void LateUpdate()
     {
-        DrawVisionCone();
+        DrawVisionCone(viewGetAngle, viewGetRadius, meshAreaGet);
+        DrawVisionCone(viewSeeAngle, viewSeeRadius, meshAreaSee);
     }
 
-    void DrawVisionCone()
+    private void DrawVisionCone(float viewAngle, float radius, Mesh meshArea)
     {
         float angleStep = viewAngle / rayCount;
         float startAngle = -viewAngle / 2;
@@ -111,13 +149,13 @@ public class AgentFirst : Agent
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
 
-        vertices.Add(Vector3.zero); // центр
+        vertices.Add(Vector3.zero);
 
         for (int i = 0; i <= rayCount; i++)
         {
             float angle = startAngle + angleStep * i;
             Vector3 dir = DirFromAngle(angle);
-            Vector3 endPoint = transform.InverseTransformPoint(CastRay(dir));
+            Vector3 endPoint = transform.InverseTransformPoint(CastRay(dir, radius));
             vertices.Add(endPoint);
         }
 
@@ -134,23 +172,35 @@ public class AgentFirst : Agent
         meshArea.RecalculateNormals();
     }
 
-    Vector3 CastRay(Vector3 direction)
+    Vector3 CastRay(Vector3 direction, float radius)
     {
         Vector3 worldOrigin = transform.position;
-        if (Physics.Raycast(worldOrigin, direction, out RaycastHit hit, viewRadius, obstacleMask))
+        if (Physics.Raycast(worldOrigin, direction, out RaycastHit hit, radius, obstacleMask))
         {
             return hit.point;
         }
-        return worldOrigin + direction * viewRadius;
+        return worldOrigin + direction * radius;
     }
 
+
+    private bool CanGetTarget()
+    {
+        Vector3 dirToTarget = (targetPosition.position - transform.position).normalized;
+        float dstToTarget = Vector3.Distance(transform.position, targetPosition.position);
+
+        if (Vector3.Angle(transform.forward, dirToTarget) < viewGetAngle / 2 && dstToTarget <= viewGetRadius)
+            if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, obstacleMask))
+                return true;
+
+        return false;
+    }
 
     private bool CanSeeTarget()
     {
         Vector3 dirToTarget = (targetPosition.position - transform.position).normalized;
         float dstToTarget = Vector3.Distance(transform.position, targetPosition.position);
 
-        if (Vector3.Angle(transform.forward, dirToTarget) < viewAngle / 2 && dstToTarget <= viewRadius)
+        if (Vector3.Angle(transform.forward, dirToTarget) < viewSeeAngle / 2 && dstToTarget <= viewSeeRadius)
             if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, obstacleMask))
                 return true;
 
@@ -160,13 +210,22 @@ public class AgentFirst : Agent
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, viewRadius);
+        Gizmos.DrawWireSphere(transform.position, viewGetRadius);
 
-        Vector3 viewAngleA = DirFromAngle(-viewAngle / 2);
-        Vector3 viewAngleB = DirFromAngle(viewAngle / 2);
+        Vector3 viewAngleA = DirFromAngle(-viewGetAngle / 2);
+        Vector3 viewAngleB = DirFromAngle(viewGetAngle / 2);
 
-        Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewRadius);
-        Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewRadius);
+        Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewGetRadius);
+        Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewGetRadius);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, viewSeeRadius);
+
+        Vector3 viewSeeAngleA = DirFromAngle(-viewSeeAngle / 2);
+        Vector3 viewSeeAngleB = DirFromAngle(viewSeeAngle / 2);
+
+        Gizmos.DrawLine(transform.position, transform.position + viewSeeAngleA * viewSeeRadius);
+        Gizmos.DrawLine(transform.position, transform.position + viewSeeAngleB * viewSeeRadius);
 
     }
 
