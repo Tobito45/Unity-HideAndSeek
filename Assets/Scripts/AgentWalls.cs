@@ -5,9 +5,12 @@ using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class AgentWalls : Agent
 {
+    private float previousDistance;
+
     [SerializeField]
     private Transform targetPosition;
     [SerializeField]
@@ -71,6 +74,8 @@ public class AgentWalls : Agent
         lastSeenTargetPosition = null;
         transform.localRotation = Quaternion.identity;
         targetPosition.localPosition = GetRandomPositionInCircle((floorMeshRender.gameObject.transform.localScale.x - 0.5f) / 2);
+
+        previousDistance = Vector3.Distance(transform.localPosition, targetPosition.localPosition);
 
         ResetWalls();
     }
@@ -198,11 +203,12 @@ public class AgentWalls : Agent
     {
         // With SetReward you set the reward of a specific step during learning. With AddReward you add a value to the current reward value of that step.
 
-        float moveX = actions.ContinuousActions[0];
-        float moveZ = actions.ContinuousActions[1];
-        float rotationY = actions.ContinuousActions[2];
+        //float moveX = actions.ContinuousActions[0];
+        //float moveZ = actions.ContinuousActions[1
+        Vector3 move = new Vector3(actions.ContinuousActions[0], 0, actions.ContinuousActions[1]);
+        transform.localPosition += move * Time.deltaTime * moveSpeed;
 
-        transform.localPosition += new Vector3(moveX, 0, moveZ) * Time.deltaTime * moveSpeed;
+        float rotationY = actions.ContinuousActions[2];
         transform.Rotate(Vector3.up, rotationY * rotationSpeed * Time.deltaTime);
 
         if (CanSeeTarget())
@@ -210,15 +216,21 @@ public class AgentWalls : Agent
             lastSeenTargetPosition = targetPosition.localPosition;
             lastSeenTime = Time.time;
 
+            float distance = Vector3.Distance(transform.localPosition, targetPosition.localPosition);
+            float distDelta = previousDistance - distance;
+            AddReward(distDelta * 0.1f);
+            previousDistance = distance;
+
+            // Instead of this add reward as Agent keeps target in sight?
+            // AddReward(0.01f);
             if (!hasGivenSightReward)
             {
                 SetReward(0.1f);
                 hasGivenSightReward = true;
             }
-        } else
-        {
-            AddReward(-0.2f);
         }
+
+        AddReward(-0.001f);     // time penalty     
 
         if (lastSeenTargetPosition.HasValue && CanGetTarget())
         {

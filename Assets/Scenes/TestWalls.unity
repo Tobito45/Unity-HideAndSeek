@@ -1894,12 +1894,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4888424819395320521, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+      propertyPath: m_Model
+      value: 
+      objectReference: {fileID: 5022602860645237092, guid: 05723c6223f49374b8fd033aa6f24343, type: 3}
+    - target: {fileID: 4888424819395320521, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
       propertyPath: m_BehaviorName
-      value: MoveToGoalWalls
+      value: MoveToGoalWallsV2
       objectReference: {fileID: 0}
     - target: {fileID: 4888424819395320521, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
       propertyPath: m_BehaviorType
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6840886207842003012, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
       propertyPath: wallCount
@@ -1911,7 +1915,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8985683768701175815, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
       propertyPath: m_Constraints
-      value: 80
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
