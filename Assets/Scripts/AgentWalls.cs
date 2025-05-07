@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class AgentWalls : Agent
@@ -51,6 +52,8 @@ public class AgentWalls : Agent
     private float forgetTime = 5f;
     private float lastSeenTime = -10f;
 
+    //TODO Freeze X & Z rotation of Agent's RigidBody? (Agent may crash into the wall and flip over)
+    
     private void Start()
     {
         meshAreaGet = new Mesh();
@@ -121,7 +124,7 @@ public class AgentWalls : Agent
 
     private bool IsPositionValidSimple(Vector3 position, Vector3 scale, Quaternion rotation)
     {
-        Vector3 agentMin = transform.localPosition - transform.localScale / 2f;
+        /*Vector3 agentMin = transform.localPosition - transform.localScale / 2f;
         Vector3 agentMax = transform.localPosition + transform.localScale / 2f;
         Vector3 targetMin = targetPosition.localPosition - targetPosition.localScale / 2f;
         Vector3 targetMax = targetPosition.localPosition + targetPosition.localScale / 2f;
@@ -132,16 +135,24 @@ public class AgentWalls : Agent
         float dy_wallAgent = Mathf.Max(0, Mathf.Max(wallMin.y - agentMax.y, agentMin.y - wallMax.y));
         float dz_wallAgent = Mathf.Max(0, Mathf.Max(wallMin.z - agentMax.z, agentMin.z - wallMax.z));
         float minDistanceFromAgent = Mathf.Sqrt(dx_wallAgent * dx_wallAgent + dy_wallAgent * dy_wallAgent + dz_wallAgent * dz_wallAgent);
-        // float minDistanceFromAgent = 1.0f;
-        if (Vector3.Distance(position, transform.localPosition) < minDistanceFromAgent)
+        if (Vector3.Distance(position, transform.localPosition) < minDistanceFromAgent + 1.0f)
             return false;
 
         float dx_wallTarget = Mathf.Max(0, Mathf.Max(wallMin.x - targetMax.x, targetMin.x - wallMax.x));
         float dy_wallTarget = Mathf.Max(0, Mathf.Max(wallMin.y - targetMax.y, targetMin.y - wallMax.y));
         float dz_wallTarget = Mathf.Max(0, Mathf.Max(wallMin.z - targetMax.z, targetMin.z - wallMax.z));
         float minDistanceFromTarget = Mathf.Sqrt(dx_wallTarget * dx_wallTarget + dy_wallTarget * dy_wallTarget + dz_wallTarget * dz_wallTarget);
-        //float minDistanceFromTarget = 1.0f;
-        if (Vector3.Distance(position, targetPosition.localPosition) < minDistanceFromTarget)
+        if (Vector3.Distance(position, targetPosition.localPosition) < minDistanceFromTarget + 1.0f)
+            return false;*/
+
+        float minDistanceFromAgent = 0.5f;
+        float actualDistance = Vector3.Distance(position, transform.localPosition);
+        if (actualDistance < minDistanceFromAgent + (scale.magnitude / 2) + (transform.localScale.magnitude / 2))
+            return false;
+
+        float minDistanceFromTarget = 0.5f;
+        float actualTargetDistance = Vector3.Distance(position, targetPosition.localPosition);
+        if (actualTargetDistance < minDistanceFromTarget + (scale.magnitude / 2) + (targetPosition.localScale.magnitude / 2))
             return false;
 
         foreach (GameObject existingWall in _walls)
@@ -154,96 +165,8 @@ public class AgentWalls : Agent
                 return false;
             }
         }
-        /*Vector3 worldPosition = transform.parent.TransformPoint(position);
-        Collider[] overlaps = Physics.OverlapBox(
-            worldPosition,
-            scale / 2,
-            rotation,
-            LayerMask.GetMask("OuterBoundaries", "LocalWall")
-        );
-        return overlaps.Length == 0;*/
         return true;
     }
-
-    /*public void ResetWalls()
-    {
-        for (int i = _walls.Count - 1; i >= 0; i--)
-            Destroy(_walls[i]);
-
-        _walls.Clear();
-        _sawWalls.Clear();
-
-        for (int i = 0; i < wallCount; i++)
-        {
-            bool validPosition = false;
-            GameObject cube = null;
-            while (!validPosition)
-            {
-                float radius = floorMeshRender.transform.localScale.x * 0.5f;
-                Vector2 randomCircle = Random.insideUnitCircle * radius;
-                Vector3 randomPosition = new Vector3(
-                    randomCircle.x,
-                    0.5f,
-                    randomCircle.y
-                );
-                Vector3 randomScale = new Vector3(
-                    Random.Range(0.5f, 8f),
-                    Random.Range(2f, 5f),
-                    Random.Range(0.5f, 2f)
-                );
-                Quaternion randomRotation = Quaternion.Euler(0, Random.Range(0f, 360f), 0);
-
-                if (IsPositionValid(randomPosition, randomScale, randomRotation))
-                {
-                    validPosition = true;
-                    cube = Instantiate(_wallPrefab, transform.parent);
-                    cube.transform.localPosition = randomPosition;
-                    cube.transform.localScale = randomScale;
-                    cube.transform.rotation = randomRotation;
-                    _walls.Add(cube);
-                }
-            }
-        }
-    }
-
-    private bool IsPositionValid(Vector3 position, Vector3 scale, Quaternion rotation)
-    {
-        float minDistanceFromAgent = 2.0f;
-        if (Vector3.Distance(position, transform.localPosition) < minDistanceFromAgent)
-            return false;
-
-        float minDistanceFromTarget = 2.0f;
-        if (Vector3.Distance(position, targetPosition.localPosition) < minDistanceFromTarget)
-            return false;
-
-        Vector3 halfExtents = scale / 2;
-
-        foreach (GameObject existingWall in _walls)
-        {
-            Vector3 worldPosition = transform.parent.TransformPoint(position);
-            Vector3 worldDirection = rotation * Vector3.forward;
-            Collider wallCollider = existingWall.GetComponent<Collider>();
-            if (wallCollider == null) continue;
-            if (Physics.BoxCast(
-                worldPosition,
-                halfExtents,
-                worldDirection,
-                out RaycastHit hit,
-                rotation,
-                0.1f,
-                LayerMask.GetMask("OuterBoundaries", "LocalWall")))
-            {
-                return false;
-            }
-            float minDistanceBetweenWalls = 1.0f;
-            if (Vector3.Distance(position, existingWall.transform.localPosition) <
-                minDistanceBetweenWalls + halfExtents.magnitude + existingWall.transform.localScale.magnitude / 2)
-            {
-                return false;
-            }
-        }
-        return true;
-    }*/
 
     public override void CollectObservations(VectorSensor sensor)
     {
@@ -273,6 +196,8 @@ public class AgentWalls : Agent
 
     public override void OnActionReceived(ActionBuffers actions)
     {
+        // With SetReward you set the reward of a specific step during learning. With AddReward you add a value to the current reward value of that step.
+
         float moveX = actions.ContinuousActions[0];
         float moveZ = actions.ContinuousActions[1];
         float rotationY = actions.ContinuousActions[2];
@@ -290,6 +215,9 @@ public class AgentWalls : Agent
                 SetReward(0.1f);
                 hasGivenSightReward = true;
             }
+        } else
+        {
+            AddReward(-0.2f);
         }
 
         if (lastSeenTargetPosition.HasValue && CanGetTarget())
@@ -307,19 +235,42 @@ public class AgentWalls : Agent
     }
     public override void Heuristic(in ActionBuffers actionsOut)
     {
-        ActionSegment<float> continiusActions = actionsOut.ContinuousActions;
-        continiusActions[0] = Input.GetAxisRaw("Horizontal");
-        continiusActions[1] = Input.GetAxisRaw("Vertical");
-        continiusActions[2] = Input.GetKey(KeyCode.Q) ? -1f : Input.GetKey(KeyCode.E) ? 1f : 0f;
+        ActionSegment<float> continuousActions = actionsOut.ContinuousActions;
+        //continiusActions[0] = Input.GetAxisRaw("Horizontal");
+        //continiusActions[1] = Input.GetAxisRaw("Vertical");
+        //continiusActions[2] = Input.GetKey(KeyCode.Q) ? -1f : Input.GetKey(KeyCode.E) ? 1f : 0f;
+
+        if (Input.GetKey(KeyCode.R))
+            EndEpisode();
+
+        float rotation = 0f;
+        if (Input.GetKey(KeyCode.A))
+            rotation = -1f;
+        else if (Input.GetKey(KeyCode.D))
+            rotation = 1f;
+
+        float moveForward = 0f;
+        if (Input.GetKey(KeyCode.W))
+            moveForward = 1f;
+        else if (Input.GetKey(KeyCode.S))
+            moveForward = -1f;
+
+        float moveX = moveForward * Mathf.Sin(transform.eulerAngles.y * Mathf.Deg2Rad);
+        float moveZ = moveForward * Mathf.Cos(transform.eulerAngles.y * Mathf.Deg2Rad);
+
+        continuousActions[0] = moveX;
+        continuousActions[1] = moveZ;
+        continuousActions[2] = rotation;
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Goal")
         {
-            //SetReward(1f);
-            //EndEpisode();
-            //floorMeshRender.material = winMat;
+            // Reward given for reaching target has to be larger than reward obtained during episode run
+            SetReward(1f);
+            EndEpisode();
+            floorMeshRender.material = winMat;
         }
 
         if (other.tag == "Wall")
