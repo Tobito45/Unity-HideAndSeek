@@ -43,6 +43,9 @@ public class AgentWalls : Agent
     private List<GameObject> _walls = new();
     private HashSet<Transform> _sawWalls = new();
 
+    [SerializeField]
+    private int wallCount = 3;
+
     private Vector3? lastSeenTargetPosition = null;
     private bool hasGivenSightReward = false;
     private float forgetTime = 5f;
@@ -77,30 +80,170 @@ public class AgentWalls : Agent
         _walls.Clear();
         _sawWalls.Clear();
 
-        int countWalls = Random.Range(1, 5);
-        for (int i = 0; i < countWalls; i++)
+        float floorRadius = (floorMeshRender.gameObject.transform.localScale.x - 0.5f) / 2;
+        int maxAttempts = 50;
+
+        for (int i = 0; i < wallCount; i++)
         {
-            Vector3 randomPosition = new Vector3(
-                Random.Range(-floorMeshRender.transform.localScale.x * 0.5f, floorMeshRender.transform.localScale.x * 0.5f),
-                0.5f,
-                Random.Range(-floorMeshRender.transform.localScale.z * 0.5f, floorMeshRender.transform.localScale.z * 0.5f)
-            );
+            bool placedWall = false;
+            int attempts = 0;
 
-            GameObject cube = Instantiate(_wallPrefab, transform.parent);
-            cube.transform.localPosition = randomPosition;
+            while (!placedWall && attempts < maxAttempts)
+            {
+                attempts++;
+                float radius = floorRadius * 0.9f;
+                Vector2 randomCircle = Random.insideUnitCircle * radius;
+                Vector3 randomPosition = new Vector3(
+                    randomCircle.x,
+                    0.5f,
+                    randomCircle.y
+                );
+                Vector3 randomScale = new Vector3(
+                    Random.Range(2f, 6f),
+                    1.0f,
+                    1.0f
+                );
+                Quaternion randomRotation = Quaternion.Euler(0, Random.Range(0f, 360f), 0);
 
-            Vector3 randomScale = new Vector3(
-                Random.Range(0.5f, 2f),
-                Random.Range(2f, 5f),
-                Random.Range(0.5f, 2f)
-            );
-            cube.transform.localScale = randomScale;
-
-            cube.transform.rotation = Quaternion.Euler(0, Random.Range(0f, 360f), 0);
-            _walls.Add(cube);
+                if (IsPositionValidSimple(randomPosition, randomScale, randomRotation))
+                {
+                    GameObject cube = Instantiate(_wallPrefab, transform.parent);
+                    cube.transform.localPosition = randomPosition;
+                    cube.transform.localScale = randomScale;
+                    cube.transform.rotation = randomRotation;
+                    _walls.Add(cube);
+                    placedWall = true;
+                    cube.layer = LayerMask.NameToLayer("LocalWall");
+                }
+            }
         }
     }
 
+    private bool IsPositionValidSimple(Vector3 position, Vector3 scale, Quaternion rotation)
+    {
+        Vector3 agentMin = transform.localPosition - transform.localScale / 2f;
+        Vector3 agentMax = transform.localPosition + transform.localScale / 2f;
+        Vector3 targetMin = targetPosition.localPosition - targetPosition.localScale / 2f;
+        Vector3 targetMax = targetPosition.localPosition + targetPosition.localScale / 2f;
+        Vector3 wallMin = position - scale / 2f;
+        Vector3 wallMax = position + scale / 2f;
+
+        float dx_wallAgent = Mathf.Max(0, Mathf.Max(wallMin.x - agentMax.x, agentMin.x - wallMax.x));
+        float dy_wallAgent = Mathf.Max(0, Mathf.Max(wallMin.y - agentMax.y, agentMin.y - wallMax.y));
+        float dz_wallAgent = Mathf.Max(0, Mathf.Max(wallMin.z - agentMax.z, agentMin.z - wallMax.z));
+        float minDistanceFromAgent = Mathf.Sqrt(dx_wallAgent * dx_wallAgent + dy_wallAgent * dy_wallAgent + dz_wallAgent * dz_wallAgent);
+        // float minDistanceFromAgent = 1.0f;
+        if (Vector3.Distance(position, transform.localPosition) < minDistanceFromAgent)
+            return false;
+
+        float dx_wallTarget = Mathf.Max(0, Mathf.Max(wallMin.x - targetMax.x, targetMin.x - wallMax.x));
+        float dy_wallTarget = Mathf.Max(0, Mathf.Max(wallMin.y - targetMax.y, targetMin.y - wallMax.y));
+        float dz_wallTarget = Mathf.Max(0, Mathf.Max(wallMin.z - targetMax.z, targetMin.z - wallMax.z));
+        float minDistanceFromTarget = Mathf.Sqrt(dx_wallTarget * dx_wallTarget + dy_wallTarget * dy_wallTarget + dz_wallTarget * dz_wallTarget);
+        //float minDistanceFromTarget = 1.0f;
+        if (Vector3.Distance(position, targetPosition.localPosition) < minDistanceFromTarget)
+            return false;
+
+        foreach (GameObject existingWall in _walls)
+        {
+            float minDistanceBetweenWalls = 1.0f;
+            float combinedExtent = (scale.magnitude + existingWall.transform.localScale.magnitude) / 2;
+
+            if (Vector3.Distance(position, existingWall.transform.localPosition) < minDistanceBetweenWalls + combinedExtent)
+            {
+                return false;
+            }
+        }
+        /*Vector3 worldPosition = transform.parent.TransformPoint(position);
+        Collider[] overlaps = Physics.OverlapBox(
+            worldPosition,
+            scale / 2,
+            rotation,
+            LayerMask.GetMask("OuterBoundaries", "LocalWall")
+        );
+        return overlaps.Length == 0;*/
+        return true;
+    }
+
+    /*public void ResetWalls()
+    {
+        for (int i = _walls.Count - 1; i >= 0; i--)
+            Destroy(_walls[i]);
+
+        _walls.Clear();
+        _sawWalls.Clear();
+
+        for (int i = 0; i < wallCount; i++)
+        {
+            bool validPosition = false;
+            GameObject cube = null;
+            while (!validPosition)
+            {
+                float radius = floorMeshRender.transform.localScale.x * 0.5f;
+                Vector2 randomCircle = Random.insideUnitCircle * radius;
+                Vector3 randomPosition = new Vector3(
+                    randomCircle.x,
+                    0.5f,
+                    randomCircle.y
+                );
+                Vector3 randomScale = new Vector3(
+                    Random.Range(0.5f, 8f),
+                    Random.Range(2f, 5f),
+                    Random.Range(0.5f, 2f)
+                );
+                Quaternion randomRotation = Quaternion.Euler(0, Random.Range(0f, 360f), 0);
+
+                if (IsPositionValid(randomPosition, randomScale, randomRotation))
+                {
+                    validPosition = true;
+                    cube = Instantiate(_wallPrefab, transform.parent);
+                    cube.transform.localPosition = randomPosition;
+                    cube.transform.localScale = randomScale;
+                    cube.transform.rotation = randomRotation;
+                    _walls.Add(cube);
+                }
+            }
+        }
+    }
+
+    private bool IsPositionValid(Vector3 position, Vector3 scale, Quaternion rotation)
+    {
+        float minDistanceFromAgent = 2.0f;
+        if (Vector3.Distance(position, transform.localPosition) < minDistanceFromAgent)
+            return false;
+
+        float minDistanceFromTarget = 2.0f;
+        if (Vector3.Distance(position, targetPosition.localPosition) < minDistanceFromTarget)
+            return false;
+
+        Vector3 halfExtents = scale / 2;
+
+        foreach (GameObject existingWall in _walls)
+        {
+            Vector3 worldPosition = transform.parent.TransformPoint(position);
+            Vector3 worldDirection = rotation * Vector3.forward;
+            Collider wallCollider = existingWall.GetComponent<Collider>();
+            if (wallCollider == null) continue;
+            if (Physics.BoxCast(
+                worldPosition,
+                halfExtents,
+                worldDirection,
+                out RaycastHit hit,
+                rotation,
+                0.1f,
+                LayerMask.GetMask("OuterBoundaries", "LocalWall")))
+            {
+                return false;
+            }
+            float minDistanceBetweenWalls = 1.0f;
+            if (Vector3.Distance(position, existingWall.transform.localPosition) <
+                minDistanceBetweenWalls + halfExtents.magnitude + existingWall.transform.localScale.magnitude / 2)
+            {
+                return false;
+            }
+        }
+        return true;
+    }*/
 
     public override void CollectObservations(VectorSensor sensor)
     {
