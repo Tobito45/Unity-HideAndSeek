@@ -121,7 +121,7 @@ public class AgentWalls : Agent
                     cube.transform.rotation = randomRotation;
                     _walls.Add(cube);
                     placedWall = true;
-                    cube.layer = LayerMask.NameToLayer("LocalWall");
+                    cube.tag = "LocalWall";
                 }
             }
         }
@@ -186,6 +186,8 @@ public class AgentWalls : Agent
         {
             foreach (Transform v in _sawWalls)
             {
+                if(v == null)
+                    continue;
                 sensor.AddObservation(v.localPosition);
                 sensor.AddObservation(v.localScale);
             }
@@ -374,7 +376,7 @@ public class AgentWalls : Agent
                 if (hit.collider.CompareTag("LocalWall"))
                 {
                     if (!_sawWalls.Contains(hit.transform))
-                        _sawWalls.Add(hit.transform);
+                       _sawWalls.Add(hit.transform);
                     continue;
                 }
                 else if (hit.collider.CompareTag("Goal"))
