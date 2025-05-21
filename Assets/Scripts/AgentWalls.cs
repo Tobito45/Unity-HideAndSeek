@@ -108,7 +108,7 @@ public class AgentWalls : Agent
                 );
                 Vector3 randomScale = new Vector3(
                     Random.Range(2f, 6f),
-                    1.0f,
+                    2.0f,
                     1.0f
                 );
                 Quaternion randomRotation = Quaternion.Euler(0, Random.Range(0f, 360f), 0);
@@ -227,25 +227,24 @@ public class AgentWalls : Agent
             // AddReward(0.01f);
             if (!hasGivenSightReward)
             {
-                SetReward(0.1f);
+                SetReward(100f);
                 hasGivenSightReward = true;
             }
-        }
-
-        AddReward(-0.001f);     // time penalty     
+        } else
+            AddReward(-0.001f);     // time penalty     
 
         if (lastSeenTargetPosition.HasValue && CanGetTarget())
         {
-            SetReward(1f);
+            SetReward(1000f);
             EndEpisode();
             floorMeshRender.material = winMat;
         }
 
-        if (hasGivenSightReward && Time.time - lastSeenTime > forgetTime)
+        /*if (hasGivenSightReward && Time.time - lastSeenTime > forgetTime)
         {
             lastSeenTargetPosition = null;
             hasGivenSightReward = false;
-        }
+        }*/
     }
     public override void Heuristic(in ActionBuffers actionsOut)
     {
@@ -282,14 +281,14 @@ public class AgentWalls : Agent
         if (other.tag == "Goal")
         {
             // Reward given for reaching target has to be larger than reward obtained during episode run
-            SetReward(1f);
+            SetReward(1000f);
             EndEpisode();
             floorMeshRender.material = winMat;
         }
 
         if (other.tag == "Wall")
         {
-            SetReward(-1f);
+            SetReward(-1000f);
             EndEpisode();
             floorMeshRender.material = loseMat;
         }
@@ -348,8 +347,9 @@ public class AgentWalls : Agent
         Vector3 dirToTarget = (targetPosition.position - transform.position).normalized;
         float dstToTarget = Vector3.Distance(transform.position, targetPosition.position);
 
+        Debug.Log((Vector3.Angle(transform.forward, dirToTarget) < viewGetAngle / 2) + " " + (dstToTarget <= viewGetRadius));
         if (Vector3.Angle(transform.forward, dirToTarget) < viewGetAngle / 2 && dstToTarget <= viewGetRadius)
-            if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, obstacleMask))
+            //if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, obstacleMask))
                 return true;
 
         return false;
@@ -387,7 +387,7 @@ public class AgentWalls : Agent
                 Debug.DrawRay(transform.position, dir * viewSeeRadius, Color.green); 
             }
         }
-        return false;
+        return sawGoal;
     }
 
     private void OnDrawGizmosSelected()

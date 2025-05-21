@@ -1,0 +1,47 @@
+{
+    "MoveToGoalWallsV4": {
+        "checkpoints": [
+            {
+                "steps": 499939,
+                "file_path": "results\\TestWallsSmoothV5\\MoveToGoalWallsV4\\MoveToGoalWallsV4-499939.onnx",
+                "reward": null,
+                "creation_time": 1747819322.6649365,
+                "auxillary_file_paths": [
+                    "results\\TestWallsSmoothV5\\MoveToGoalWallsV4\\MoveToGoalWallsV4-499939.pt"
+                ]
+            },
+            {
+                "steps": 999987,
+                "file_path": "results\\TestWallsSmoothV5\\MoveToGoalWallsV4\\MoveToGoalWallsV4-999987.onnx",
+                "reward": null,
+                "creation_time": 1747820131.9353561,
+                "auxillary_file_paths": [
+                    "results\\TestWallsSmoothV5\\MoveToGoalWallsV4\\MoveToGoalWallsV4-999987.pt"
+                ]
+            },
+            {
+                "steps": 1249323,
+                "file_path": "results\\TestWallsSmoothV5\\MoveToGoalWallsV4\\MoveToGoalWallsV4-1249323.onnx",
+                "reward": -14.99800106883049,
+                "creation_time": 1747820558.23513,
+                "auxillary_file_paths": [
+                    "results\\TestWallsSmoothV5\\MoveToGoalWallsV4\\MoveToGoalWallsV4-1249323.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 1249323,
+            "file_path": "results\\TestWallsSmoothV5\\MoveToGoalWallsV4.onnx",
+            "reward": -14.99800106883049,
+            "creation_time": 1747820558.23513,
+            "auxillary_file_paths": [
+                "results\\TestWallsSmoothV5\\MoveToGoalWallsV4\\MoveToGoalWallsV4-1249323.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cu121"
+    }
+}

@@ -380,7 +380,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: 73e42c23c7d60f644b8eb4552e0c61b0, type: 3}
+  m_Model: {fileID: 0}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: MoveToGoalWallsV4
@@ -419,7 +419,7 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 2000
+  MaxStep: 15000
   targetPosition: {fileID: 1261522269651982928}
   winMat: {fileID: 2100000, guid: 55ff4cfbf573dc84e9e03c57f1573320, type: 2}
   loseMat: {fileID: 2100000, guid: 02b868fa092a79648a79475b37b29a14, type: 2}
