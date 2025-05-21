@@ -5,11 +5,21 @@ using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static UnityEngine.GraphicsBuffer;
 
 public class AgentWalls : Agent
 {
-    private float previousDistance;
+    [SerializeField]
+    private int gridSize = 20;
+    [SerializeField]
+    private float explorationReward = 0.01f;
+
+    private bool[,] exploredGrid;
+    private float gridCellSize;
+    private Vector3 gridOrigin;
+
+    private float distanceScale = 10f;
 
     [SerializeField]
     private Transform targetPosition;
@@ -66,6 +76,8 @@ public class AgentWalls : Agent
         meshAreaSee = new Mesh();
         meshAreaSee.name = "View Mesh See";
         meshFilterAreaSee.mesh = meshAreaSee;
+
+        InitializeExplorationGrid();
     }
 
     public override void OnEpisodeBegin()
@@ -75,7 +87,15 @@ public class AgentWalls : Agent
         transform.localRotation = Quaternion.identity;
         targetPosition.localPosition = GetRandomPositionInCircle((floorMeshRender.gameObject.transform.localScale.x - 0.5f) / 2);
 
-        previousDistance = Vector3.Distance(transform.localPosition, targetPosition.localPosition);
+        // previousDistance = Vector3.Distance(transform.localPosition, targetPosition.localPosition);
+        
+        for (int x = 0; x < gridSize; x++)
+        {
+            for (int z = 0; z < gridSize; z++)
+            {
+                exploredGrid[x, z] = false;
+            }
+        }
 
         ResetWalls();
     }
@@ -172,6 +192,70 @@ public class AgentWalls : Agent
         }
         return true;
     }
+    private void InitializeExplorationGrid()
+    {
+        exploredGrid = new bool[gridSize, gridSize];
+        float floorRadius = (floorMeshRender.gameObject.transform.localScale.x - 0.5f) / 2;
+        gridCellSize = (floorRadius * 2) / gridSize;
+        gridOrigin = new Vector3(-floorRadius, 0, -floorRadius);
+    }
+
+    private void UpdateExplorationGrid()
+    {
+        Vector3 agentPos = transform.localPosition;
+        int gridX = Mathf.FloorToInt((agentPos.x - gridOrigin.x) / gridCellSize);
+        int gridZ = Mathf.FloorToInt((agentPos.z - gridOrigin.z) / gridCellSize);
+
+        // Check bounds
+        if (gridX >= 0 && gridX < gridSize && gridZ >= 0 && gridZ < gridSize)
+        {
+            if (!exploredGrid[gridX, gridZ])
+            {
+                exploredGrid[gridX, gridZ] = true;
+                AddReward(explorationReward); // Reward for exploring new area
+            }
+        }
+    }
+
+    private float GetExplorationProgress()
+    {
+        int exploredCells = 0;
+        for (int x = 0; x < gridSize; x++)
+        {
+            for (int z = 0; z < gridSize; z++)
+            {
+                if (exploredGrid[x, z])
+                    exploredCells++;
+            }
+        }
+        return (float)exploredCells / (gridSize * gridSize);
+    }
+
+    private void AddLocalExplorationObservations(VectorSensor sensor)
+    {
+        Vector3 agentPos = transform.localPosition;
+        int agentGridX = Mathf.FloorToInt((agentPos.x - gridOrigin.x) / gridCellSize);
+        int agentGridZ = Mathf.FloorToInt((agentPos.z - gridOrigin.z) / gridCellSize);
+
+        // Check 3x3 grid around agent
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int z = -1; z <= 1; z++)
+            {
+                int checkX = agentGridX + x;
+                int checkZ = agentGridZ + z;
+
+                if (checkX >= 0 && checkX < gridSize && checkZ >= 0 && checkZ < gridSize)
+                {
+                    sensor.AddObservation(exploredGrid[checkX, checkZ] ? 1f : 0f);
+                }
+                else
+                {
+                    sensor.AddObservation(-1f); // Out of bounds
+                }
+            }
+        }
+    }
 
     public override void CollectObservations(VectorSensor sensor)
     {
@@ -197,6 +281,10 @@ public class AgentWalls : Agent
             sensor.AddObservation(Vector3.zero);
             sensor.AddObservation(Vector3.zero);
         }
+
+        float explorationProgress = GetExplorationProgress();
+        sensor.AddObservation(explorationProgress);
+        AddLocalExplorationObservations(sensor);
     }
 
 
@@ -205,34 +293,42 @@ public class AgentWalls : Agent
     {
         // With SetReward you set the reward of a specific step during learning. With AddReward you add a value to the current reward value of that step.
 
-        //float moveX = actions.ContinuousActions[0];
-        //float moveZ = actions.ContinuousActions[1
+        // MOVE AND ROTATE
         Vector3 move = new Vector3(actions.ContinuousActions[0], 0, actions.ContinuousActions[1]);
         transform.localPosition += move * Time.deltaTime * moveSpeed;
 
         float rotationY = actions.ContinuousActions[2];
         transform.Rotate(Vector3.up, rotationY * rotationSpeed * Time.deltaTime);
 
+        // UPDATE EXPLORATION GRID
+        UpdateExplorationGrid();
+
+        // TARGET IN SIGHT
         if (CanSeeTarget())
         {
             lastSeenTargetPosition = targetPosition.localPosition;
             lastSeenTime = Time.time;
 
-            float distance = Vector3.Distance(transform.localPosition, targetPosition.localPosition);
-            float distDelta = previousDistance - distance;
-            AddReward(distDelta * 0.1f);
-            previousDistance = distance;
-
-            // Instead of this add reward as Agent keeps target in sight?
-            // AddReward(0.01f);
+            // Instead of this, agent gets reward for keeping the target in sight
+            /*
             if (!hasGivenSightReward)
             {
                 SetReward(0.1f);
                 hasGivenSightReward = true;
             }
+            */
+            AddReward(0.0005f);
+
+            // PROXIMITY REWARD - Moving towards target is encouraged
+            float distance = Vector3.Distance(transform.localPosition, targetPosition.localPosition);
+            float normalizedDistance = distance / (distance + distanceScale);
+            // float distDelta = previousDistance - distance;
+            // previousDistance = distance;
+            AddReward(1 - normalizedDistance);
         }
 
-        AddReward(-0.001f);     // time penalty     
+        // TIME PENATLY - Quicker decisions are encouraged
+        AddReward(-0.0001f);     // The penalty given to Agent has to be small, because otherwise the Agent will have navigation problems ()
 
         if (lastSeenTargetPosition.HasValue && CanGetTarget())
         {
@@ -241,6 +337,7 @@ public class AgentWalls : Agent
             floorMeshRender.material = winMat;
         }
 
+        // AGENT FORGETS TARGET'S POSITION
         if (hasGivenSightReward && Time.time - lastSeenTime > forgetTime)
         {
             lastSeenTargetPosition = null;
@@ -410,6 +507,23 @@ public class AgentWalls : Agent
         Gizmos.DrawLine(transform.position, transform.position + viewSeeAngleA * viewSeeRadius);
         Gizmos.DrawLine(transform.position, transform.position + viewSeeAngleB * viewSeeRadius);
 
+        if (exploredGrid != null && Application.isPlaying)
+        {
+            for (int x = 0; x < gridSize; x++)
+            {
+                for (int z = 0; z < gridSize; z++)
+                {
+                    Vector3 cellCenter = gridOrigin + new Vector3(
+                        x * gridCellSize + gridCellSize * 0.5f,
+                        0.1f,
+                        z * gridCellSize + gridCellSize * 0.5f
+                    );
+
+                    Gizmos.color = exploredGrid[x, z] ? Color.green : Color.gray;
+                    Gizmos.DrawWireCube(cellCenter, new Vector3(gridCellSize, 0.1f, gridCellSize));
+                }
+            }
+        }
     }
 
     private Vector3 DirFromAngle(float angleInDegrees)
