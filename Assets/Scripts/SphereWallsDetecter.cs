@@ -5,9 +5,15 @@ public class SphereWallsDetecter : MonoBehaviour
     [SerializeField]
     private AgentWalls _agentWalls;
 
+    [SerializeField]
+    private AgentWallsGrid _agentGridWalls;
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("LocalWall"))
-            _agentWalls.ResetWalls();
+        {
+            _agentGridWalls?.ResetWalls();
+            _agentWalls?.ResetWalls();
+        }
     }
 }

@@ -1,0 +1,47 @@
+{
+    "MoveToGoalGridV1": {
+        "checkpoints": [
+            {
+                "steps": 97326,
+                "file_path": "results\\TestGridAgentV1\\MoveToGoalGridV1\\MoveToGoalGridV1-97326.onnx",
+                "reward": -979.8478175615892,
+                "creation_time": 1749031884.1232185,
+                "auxillary_file_paths": [
+                    "results\\TestGridAgentV1\\MoveToGoalGridV1\\MoveToGoalGridV1-97326.pt"
+                ]
+            },
+            {
+                "steps": 499995,
+                "file_path": "results\\TestGridAgentV1\\MoveToGoalGridV1\\MoveToGoalGridV1-499995.onnx",
+                "reward": -675.2851062938571,
+                "creation_time": 1749033563.8146715,
+                "auxillary_file_paths": [
+                    "results\\TestGridAgentV1\\MoveToGoalGridV1\\MoveToGoalGridV1-499995.pt"
+                ]
+            },
+            {
+                "steps": 500123,
+                "file_path": "results\\TestGridAgentV1\\MoveToGoalGridV1\\MoveToGoalGridV1-500123.onnx",
+                "reward": -675.2851062938571,
+                "creation_time": 1749033563.8982167,
+                "auxillary_file_paths": [
+                    "results\\TestGridAgentV1\\MoveToGoalGridV1\\MoveToGoalGridV1-500123.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 500123,
+            "file_path": "results\\TestGridAgentV1\\MoveToGoalGridV1.onnx",
+            "reward": -675.2851062938571,
+            "creation_time": 1749033563.8982167,
+            "auxillary_file_paths": [
+                "results\\TestGridAgentV1\\MoveToGoalGridV1\\MoveToGoalGridV1-500123.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cu121"
+    }
+}
