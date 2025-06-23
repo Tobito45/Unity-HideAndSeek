@@ -1,0 +1,38 @@
+{
+    "TestGridAgentV3": {
+        "checkpoints": [
+            {
+                "steps": 202930,
+                "file_path": "results\\TestGridAgentV3\\TestGridAgentV3\\TestGridAgentV3-202930.onnx",
+                "reward": -184.60010619681668,
+                "creation_time": 1750250277.9460378,
+                "auxillary_file_paths": [
+                    "results\\TestGridAgentV3\\TestGridAgentV3\\TestGridAgentV3-202930.pt"
+                ]
+            },
+            {
+                "steps": 218499,
+                "file_path": "results\\TestGridAgentV3\\TestGridAgentV3\\TestGridAgentV3-218499.onnx",
+                "reward": 188.78950093858518,
+                "creation_time": 1750250769.5695946,
+                "auxillary_file_paths": [
+                    "results\\TestGridAgentV3\\TestGridAgentV3\\TestGridAgentV3-218499.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 218499,
+            "file_path": "results\\TestGridAgentV3\\TestGridAgentV3.onnx",
+            "reward": 188.78950093858518,
+            "creation_time": 1750250769.5695946,
+            "auxillary_file_paths": [
+                "results\\TestGridAgentV3\\TestGridAgentV3\\TestGridAgentV3-218499.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cu121"
+    }
+}

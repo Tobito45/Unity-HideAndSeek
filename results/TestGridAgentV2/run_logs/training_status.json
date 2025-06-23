@@ -1,0 +1,56 @@
+{
+    "TestGridAgentV2": {
+        "checkpoints": [
+            {
+                "steps": 371476,
+                "file_path": "results\\TestGridAgentV2\\TestGridAgentV2\\TestGridAgentV2-371476.onnx",
+                "reward": null,
+                "creation_time": 1750236094.9146936,
+                "auxillary_file_paths": [
+                    "results\\TestGridAgentV2\\TestGridAgentV2\\TestGridAgentV2-371476.pt"
+                ]
+            },
+            {
+                "steps": 371860,
+                "file_path": "results\\TestGridAgentV2\\TestGridAgentV2\\TestGridAgentV2-371860.onnx",
+                "reward": null,
+                "creation_time": 1750236566.290192,
+                "auxillary_file_paths": [
+                    "results\\TestGridAgentV2\\TestGridAgentV2\\TestGridAgentV2-371860.pt"
+                ]
+            },
+            {
+                "steps": 499966,
+                "file_path": "results\\TestGridAgentV2\\TestGridAgentV2\\TestGridAgentV2-499966.onnx",
+                "reward": 497.6069007733604,
+                "creation_time": 1750238683.1286924,
+                "auxillary_file_paths": [
+                    "results\\TestGridAgentV2\\TestGridAgentV2\\TestGridAgentV2-499966.pt"
+                ]
+            },
+            {
+                "steps": 500030,
+                "file_path": "results\\TestGridAgentV2\\TestGridAgentV2\\TestGridAgentV2-500030.onnx",
+                "reward": 497.6069007733604,
+                "creation_time": 1750238683.6373906,
+                "auxillary_file_paths": [
+                    "results\\TestGridAgentV2\\TestGridAgentV2\\TestGridAgentV2-500030.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 500030,
+            "file_path": "results\\TestGridAgentV2\\TestGridAgentV2.onnx",
+            "reward": 497.6069007733604,
+            "creation_time": 1750238683.6373906,
+            "auxillary_file_paths": [
+                "results\\TestGridAgentV2\\TestGridAgentV2\\TestGridAgentV2-500030.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cu121"
+    }
+}

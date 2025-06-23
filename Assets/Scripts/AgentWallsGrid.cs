@@ -219,6 +219,8 @@ public class AgentWallsGrid : Agent
         float angleRad = transform.eulerAngles.y * Mathf.Deg2Rad;
         sensor.AddObservation(Mathf.Cos(angleRad));
         sensor.AddObservation(Mathf.Sin(angleRad));
+
+        Debug.Log("Obs count = " + sensor.ObservationSize());
     }
 
 
@@ -404,7 +406,7 @@ public class AgentWallsGrid : Agent
         Vector3 dirToTarget = (targetPosition.position - transform.position).normalized;
         float dstToTarget = Vector3.Distance(transform.position, targetPosition.position);
 
-        Debug.Log((Vector3.Angle(transform.forward, dirToTarget) < viewGetAngle / 2) + " " + (dstToTarget <= viewGetRadius));
+        // Debug.Log((Vector3.Angle(transform.forward, dirToTarget) < viewGetAngle / 2) + " " + (dstToTarget <= viewGetRadius));
         if (Vector3.Angle(transform.forward, dirToTarget) < viewGetAngle / 2 && dstToTarget <= viewGetRadius)
             //if (!Physics.Raycast(transform.position, dirToTarget, dstToTarget, obstacleMask))
             return true;

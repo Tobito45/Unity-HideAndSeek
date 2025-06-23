@@ -3382,6 +3382,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1227652252399161648, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+      propertyPath: _agentWalls
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2603202448667083153, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2603202448667083153, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+      propertyPath: DecisionPeriod
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3355487398186262457, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
       propertyPath: m_Name
       value: EnviromentWalls
@@ -3429,16 +3441,107 @@ PrefabInstance:
     - target: {fileID: 4888424819395320521, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
       propertyPath: m_Model
       value: 
-      objectReference: {fileID: 5022602860645237092, guid: b72e25bfbdcd3874b8a92adf0dc08170, type: 3}
+      objectReference: {fileID: 5022602860645237092, guid: 0f4169a8dcc95e24c831955f913d4b8c, type: 3}
+    - target: {fileID: 4888424819395320521, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+      propertyPath: m_BehaviorName
+      value: TestGridAgentV3
+      objectReference: {fileID: 0}
     - target: {fileID: 4888424819395320521, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
       propertyPath: m_BehaviorType
       value: 2
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 4888424819395320521, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+      propertyPath: m_BrainParameters.VectorObservationSize
+      value: 454
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 2603202448667083153, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+    - {fileID: 5147513567521661387, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+    - {fileID: 6840886207842003012, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 805090218707622396, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2392798100354555311}
+    - targetCorrespondingSourceObject: {fileID: 805090218707622396, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2392798100354555310}
   m_SourcePrefab: {fileID: 100100000, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+--- !u!4 &2392798100354555305 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1261522269651982928, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+  m_PrefabInstance: {fileID: 2392798100354555304}
+  m_PrefabAsset: {fileID: 0}
+--- !u!33 &2392798100354555306 stripped
+MeshFilter:
+  m_CorrespondingSourceObject: {fileID: 1662611606640810085, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+  m_PrefabInstance: {fileID: 2392798100354555304}
+  m_PrefabAsset: {fileID: 0}
+--- !u!33 &2392798100354555307 stripped
+MeshFilter:
+  m_CorrespondingSourceObject: {fileID: 6686151835478194503, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+  m_PrefabInstance: {fileID: 2392798100354555304}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2392798100354555308 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 805090218707622396, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+  m_PrefabInstance: {fileID: 2392798100354555304}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &2392798100354555309 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1385167972823316360, guid: 2b889b71ad37fe74389087a6abeedef7, type: 3}
+  m_PrefabInstance: {fileID: 2392798100354555304}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2392798100354555310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2392798100354555308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DecisionPeriod: 20
+  DecisionStep: 0
+  TakeActionsBetweenDecisions: 1
+--- !u!114 &2392798100354555311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2392798100354555308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e25b47ba81e87a4ab5c8863927d3289, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 15000
+  targetPosition: {fileID: 2392798100354555305}
+  winMat: {fileID: 2100000, guid: 55ff4cfbf573dc84e9e03c57f1573320, type: 2}
+  loseMat: {fileID: 2100000, guid: 02b868fa092a79648a79475b37b29a14, type: 2}
+  floorMeshRender: {fileID: 2392798100354555309}
+  moveSpeed: 2
+  rotationSpeed: 60
+  viewGetRadius: 3
+  viewGetAngle: 80
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  rayCount: 50
+  viewSeeRadius: 10
+  viewSeeAngle: 90
+  meshFilterAreaGet: {fileID: 2392798100354555307}
+  meshFilterAreaSee: {fileID: 2392798100354555306}
+  _wallPrefab: {fileID: 4334777039866537291, guid: 8ae89a598ef53c1409455b7dfca468fe, type: 3}
+  wallCount: 5
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
