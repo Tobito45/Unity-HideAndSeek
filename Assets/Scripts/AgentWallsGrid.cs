@@ -53,9 +53,7 @@ public class AgentWallsGrid : Agent
     private float lastSeenTime = -10f;
 
     private Dictionary<Vector2Int, CellMemory> gridMemory = new();
-    private float gridSize = 1f; 
-
-    //TODO Freeze X & Z rotation of Agent's RigidBody? (Agent may crash into the wall and flip over)
+    private int gridSize = 15;      // initialized here for simplicity
 
     private void Start()
     {
@@ -77,7 +75,7 @@ public class AgentWallsGrid : Agent
             {
                 Vector2Int cellPos = new Vector2Int(x, y);
                 if (!gridMemory.ContainsKey(cellPos))
-                    gridMemory[cellPos] = new CellMemory() { GridPos = cellPos};
+                    gridMemory[cellPos] = new CellMemory() { GridPos = cellPos };
             }
         }
     }
@@ -89,18 +87,17 @@ public class AgentWallsGrid : Agent
         lastSeenTargetPosition = null;
         transform.localRotation = Quaternion.identity;
         targetPosition.localPosition = GetRandomPositionInCircle((floorMeshRender.gameObject.transform.localScale.x - 0.5f) / 2);
-        
-        int gridSize = 15;
+
         int offset = gridSize / 2;
-        
+
         Vector2Int gridPos = new Vector2Int(Mathf.FloorToInt(targetPosition.localPosition.x + offset + 0.5f), Mathf.FloorToInt(targetPosition.localPosition.z + offset + 0.5f));
 
-       // if (gridMemory.ContainsKey(gridPos))
-         //   gridMemory[gridPos].CellType = CellState.Target;
+        // if (gridMemory.ContainsKey(gridPos))
+        //   gridMemory[gridPos].CellType = CellState.Target;
 
 
         previousDistance = Vector3.Distance(transform.localPosition, targetPosition.localPosition);
-        
+
         ResetWalls();
     }
 
@@ -178,9 +175,6 @@ public class AgentWallsGrid : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        int gridSize = 15;
-
-        // 1. ƒобавл€ем информацию о сетке
         for (int z = 0; z < gridSize; z++)
         {
             for (int x = 0; x < gridSize; x++)
@@ -205,22 +199,18 @@ public class AgentWallsGrid : Agent
             }
         }
 
-        // 2. ѕозици€ агента (в координатах сетки)
         Vector3 floorScale = floorMeshRender.transform.localScale;
         Vector3 floorPos = floorMeshRender.transform.position;
         Vector3 origin = floorPos - new Vector3(floorScale.x, 0, floorScale.z) * 0.5f;
         float cellSize = floorScale.x / gridSize;
 
         Vector2Int agentCell = WorldToGridPos(transform.position, origin, cellSize);
-        sensor.AddObservation(agentCell.x / (float)gridSize); // нормализовано
+        sensor.AddObservation(agentCell.x / (float)gridSize);
         sensor.AddObservation(agentCell.y / (float)gridSize);
 
-        // 3. ѕоворот агента (можно использовать синус/косинус дл€ направлени€)
         float angleRad = transform.eulerAngles.y * Mathf.Deg2Rad;
         sensor.AddObservation(Mathf.Cos(angleRad));
         sensor.AddObservation(Mathf.Sin(angleRad));
-
-        Debug.Log("Obs count = " + sensor.ObservationSize());
     }
 
 
@@ -235,7 +225,63 @@ public class AgentWallsGrid : Agent
         float rotationY = actions.ContinuousActions[2];
         transform.Rotate(Vector3.up, rotationY * rotationSpeed * Time.deltaTime);
 
+        // ===== REWARD STRUCTURE =====
+
+        // 1. CONSTANT TIME PENALTY (small, every step)
+        //    Encourages agent to solve episode quickly
+        AddReward(-0.001f);
+
+        // 2. PROXIMITY REWARD (when target is NOT in sight)
+        //    Encourages agent to search by moving toward target
+        if (!CanSeeTarget() && lastSeenTargetPosition.HasValue)
+        {
+            float distance = Vector3.Distance(transform.localPosition, targetPosition.localPosition);
+            float distDelta = previousDistance - distance;
+
+            // Only reward if agent is moving CLOSER (distDelta > 0)
+            if (distDelta > 0)
+            {
+                AddReward(distDelta * 0.05f);  // Small bonus for progress
+            }
+            else if (distDelta < 0)
+            {
+                AddReward(distDelta * 0.02f);  // Small penalty for moving away
+            }
+
+            previousDistance = distance;
+        }
+
+        // 3. VISION REWARD (when target comes into sight)
+        //    Significant but not game-ending reward for spotting target
         if (CanSeeTarget())
+        {
+            lastSeenTargetPosition = targetPosition.localPosition;
+            lastSeenTime = Time.time;
+
+            if (!hasGivenSightReward)
+            {
+                AddReward(50f);  // ? Use AddReward, not SetReward
+                hasGivenSightReward = true;
+            }
+            else
+            {
+                // Continue rewarding for MAINTAINING sight (small bonus each step)
+                AddReward(0.1f);
+            }
+        }
+
+        // 4. CONTACT/CAPTURE REWARD (terminal state)
+        //    Largest reward for actually reaching/capturing target
+        if (lastSeenTargetPosition.HasValue && CanGetTarget())
+        {
+            AddReward(1000f);  // ? Can use either AddReward or SetReward here
+                               //   (episode ends immediately after)
+            EndEpisode();
+            transform.parent.GetComponentInChildren<AgentHider>().EndEpisode(); 
+            floorMeshRender.material = winMat;
+        }
+
+        /*if (CanSeeTarget())
         {
             lastSeenTargetPosition = targetPosition.localPosition;
             lastSeenTime = Time.time;
@@ -261,7 +307,7 @@ public class AgentWallsGrid : Agent
             SetReward(1000f);
             EndEpisode();
             floorMeshRender.material = winMat;
-        }
+        }*/
     }
     public override void Heuristic(in ActionBuffers actionsOut)
     {
@@ -298,14 +344,14 @@ public class AgentWallsGrid : Agent
         if (other.tag == "Goal")
         {
             // Reward given for reaching target has to be larger than reward obtained during episode run
-            SetReward(1000f);
+            AddReward(200f);  // Smaller reward than vision-based (100, 50, or 300 Ч adjust based on testing)
             EndEpisode();
             floorMeshRender.material = winMat;
         }
 
-        if (other.tag == "Wall")
+        if (other.tag == "Wall")    // Boundary wall
         {
-            SetReward(-1000f);
+            AddReward(-1000f);  // Large penalty for collision failure
             EndEpisode();
             floorMeshRender.material = loseMat;
         }
@@ -363,7 +409,6 @@ public class AgentWallsGrid : Agent
     {
         if (floorMeshRender == null) return;
 
-        int gridSize = 15;
         Vector3 floorPos = floorMeshRender.transform.position;
         Vector3 floorScale = floorMeshRender.transform.localScale;
 
@@ -382,7 +427,7 @@ public class AgentWallsGrid : Agent
             else if (pair.Value.HasBeenSeen) color = Color.green; //CHANGE COLOR
 
             Gizmos.color = new Color(color.r, color.g, color.b, 0.3f);
-            Gizmos.DrawCube(center, new Vector3(cellSize * 0.95f, 0.01f, cellSize * 0.95f)); 
+            Gizmos.DrawCube(center, new Vector3(cellSize * 0.95f, 0.01f, cellSize * 0.95f));
         }
 
         Gizmos.color = Color.white;
@@ -421,7 +466,6 @@ public class AgentWallsGrid : Agent
         float startAngle = -viewSeeAngle / 2;
         bool sawGoal = false;
 
-        int gridSize = 15;
         float floorScale = floorMeshRender.transform.localScale.x;
         Vector3 origin = floorMeshRender.transform.position - new Vector3(floorScale, 0, floorScale) * 0.5f;
         float cellSize = floorScale / gridSize;

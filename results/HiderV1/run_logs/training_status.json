@@ -1,0 +1,51 @@
+{
+    "HiderV1": {
+        "checkpoints": [
+            {
+                "steps": 103440,
+                "file_path": "results\\HiderV1\\HiderV1\\HiderV1-103440.onnx",
+                "reward": null,
+                "creation_time": 1761865638.5962934,
+                "auxillary_file_paths": [
+                    "results\\HiderV1\\HiderV1\\HiderV1-103440.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 103440,
+            "file_path": "results\\HiderV1\\HiderV1.onnx",
+            "reward": null,
+            "creation_time": 1761865638.5962934,
+            "auxillary_file_paths": [
+                "results\\HiderV1\\HiderV1\\HiderV1-103440.pt"
+            ]
+        }
+    },
+    "MoveToGoalGridV1": {
+        "checkpoints": [
+            {
+                "steps": 103447,
+                "file_path": "results\\HiderV1\\MoveToGoalGridV1\\MoveToGoalGridV1-103447.onnx",
+                "reward": 1036.7868579822825,
+                "creation_time": 1761865638.7598748,
+                "auxillary_file_paths": [
+                    "results\\HiderV1\\MoveToGoalGridV1\\MoveToGoalGridV1-103447.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 103447,
+            "file_path": "results\\HiderV1\\MoveToGoalGridV1.onnx",
+            "reward": 1036.7868579822825,
+            "creation_time": 1761865638.7598748,
+            "auxillary_file_paths": [
+                "results\\HiderV1\\MoveToGoalGridV1\\MoveToGoalGridV1-103447.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cu121"
+    }
+}

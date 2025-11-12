@@ -1852,7 +1852,11 @@ PrefabInstance:
     - target: {fileID: 480877462969378085, guid: 12dcf598fb1df214697fcfe9e7f242b7, type: 3}
       propertyPath: m_Model
       value: 
-      objectReference: {fileID: 5022602860645237092, guid: 94a3ecd2a7911664baed00d330453dd1, type: 3}
+      objectReference: {fileID: 5022602860645237092, guid: 965c5be13e2cadf49be3d683c2ecf77e, type: 3}
+    - target: {fileID: 480877462969378085, guid: 12dcf598fb1df214697fcfe9e7f242b7, type: 3}
+      propertyPath: m_BehaviorName
+      value: A_01
+      objectReference: {fileID: 0}
     - target: {fileID: 480877462969378085, guid: 12dcf598fb1df214697fcfe9e7f242b7, type: 3}
       propertyPath: m_BehaviorType
       value: 2
