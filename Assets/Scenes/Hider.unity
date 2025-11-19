@@ -167,6 +167,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2563962019194126185, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
+      propertyPath: viewSeeAngle
+      value: 16
+      objectReference: {fileID: 0}
     - target: {fileID: 7995960442969209508, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
       propertyPath: m_Name
       value: EnviromentWithHider (21)
@@ -2209,27 +2213,15 @@ PrefabInstance:
     - target: {fileID: 1263112117234136015, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
       propertyPath: m_Model
       value: 
-      objectReference: {fileID: 5022602860645237092, guid: 6135e9ddfd6424c4688d3e47082b971b, type: 3}
-    - target: {fileID: 1263112117234136015, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
-      propertyPath: m_BehaviorName
-      value: SeekerV3
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 5022602860645237092, guid: 61df5bd7358ee7a49ae392c782b62a75, type: 3}
     - target: {fileID: 1263112117234136015, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
       propertyPath: m_BehaviorType
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 2807825857599434279, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
-      propertyPath: viewRadius
-      value: 8
-      objectReference: {fileID: 0}
     - target: {fileID: 7150799434059154166, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
       propertyPath: m_Model
       value: 
-      objectReference: {fileID: 5022602860645237092, guid: 2cd833f6fba96da41a9aa0ae649ddf1a, type: 3}
-    - target: {fileID: 7150799434059154166, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
-      propertyPath: m_BehaviorName
-      value: HiderV3
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 5022602860645237092, guid: 74abff6a4b79a1446a9006e2173784cb, type: 3}
     - target: {fileID: 7150799434059154166, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
       propertyPath: m_BehaviorType
       value: 2

@@ -357,6 +357,25 @@ public class AgentWallsGrid : Agent
         }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Goal")
+        {
+            // Reward given for reaching target has to be larger than reward obtained during episode run
+            AddReward(200f);  // Smaller reward than vision-based (100, 50, or 300 — adjust based on testing)
+            EndEpisode();
+            floorMeshRender.material = winMat;
+        }
+
+        if (collision.gameObject.tag == "Wall")    // Boundary wall
+        {
+            AddReward(-1000f);  // Large penalty for collision failure
+            EndEpisode();
+            floorMeshRender.material = loseMat;
+        }
+    }
+
+
     private void LateUpdate()
     {
         DrawVisionCone(viewGetAngle, viewGetRadius, meshAreaGet);
