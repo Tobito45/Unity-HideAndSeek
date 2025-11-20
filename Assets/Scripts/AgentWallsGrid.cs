@@ -317,6 +317,8 @@ public class AgentWallsGrid : Agent
             AddReward(1000f);  // ? Can use either AddReward or SetReward here
                                //   (episode ends immediately after)
             EndEpisode();
+            Object.FindFirstObjectByType<AgentHider>().AddReward(Object.FindFirstObjectByType<AgentHider>().penaltyCaught);
+            Object.FindFirstObjectByType<AgentHider>().EndEpisode();
             //transform.parent.GetComponentInChildren<AgentHider>().EndEpisode(); uncomment after seeker training
             floorMeshRender.material = winMat;
         }
@@ -386,6 +388,8 @@ public class AgentWallsGrid : Agent
             // Reward given for reaching target has to be larger than reward obtained during episode run
             AddReward(200f);  // Smaller reward than vision-based (100, 50, or 300 ï¿½ adjust based on testing)
             EndEpisode();
+            Object.FindFirstObjectByType<AgentHider>().AddReward(Object.FindFirstObjectByType<AgentHider>().penaltyCaught);
+            Object.FindFirstObjectByType<AgentHider>().EndEpisode();
             floorMeshRender.material = winMat;
         }
 
@@ -393,6 +397,7 @@ public class AgentWallsGrid : Agent
         {
             AddReward(-1000f);  // Large penalty for collision failure
             EndEpisode();
+            Object.FindFirstObjectByType<AgentHider>().EndEpisode();
             floorMeshRender.material = loseMat;
         }
     }
@@ -402,8 +407,10 @@ public class AgentWallsGrid : Agent
         if (collision.gameObject.tag == "Goal")
         {
             // Reward given for reaching target has to be larger than reward obtained during episode run
-            AddReward(200f);  // Smaller reward than vision-based (100, 50, or 300 — adjust based on testing)
+            AddReward(1000f);  // Smaller reward than vision-based (100, 50, or 300 — adjust based on testing)
             EndEpisode();
+            Object.FindFirstObjectByType<AgentHider>().AddReward(Object.FindFirstObjectByType<AgentHider>().penaltyCaught);
+            Object.FindFirstObjectByType<AgentHider>().EndEpisode();
             floorMeshRender.material = winMat;
         }
 
@@ -411,6 +418,7 @@ public class AgentWallsGrid : Agent
         {
             AddReward(-1000f);  // Large penalty for collision failure
             EndEpisode();
+            Object.FindFirstObjectByType<AgentHider>().EndEpisode();
             floorMeshRender.material = loseMat;
         }
     }

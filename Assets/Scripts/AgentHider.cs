@@ -22,6 +22,7 @@ public class AgentHider : Agent
     public float penaltyWhenSeenBySeeker = -0.02f;
     public float penaltyCaught = -1f;
     public float boundaryPenalty = -0.1f;
+    public float rewardForLiving = 0.001f;
 
     private Vector3? lastSeenSeekerPos = null;
     private Rigidbody rb;
@@ -88,6 +89,8 @@ public class AgentHider : Agent
 
         if (seekerSeesMe)
             AddReward(penaltyWhenSeenBySeeker);
+        else
+            AddReward(rewardForLiving);
 
         if (CanBeCaught())
         {

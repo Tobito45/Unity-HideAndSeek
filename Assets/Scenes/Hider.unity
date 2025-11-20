@@ -2213,15 +2213,19 @@ PrefabInstance:
     - target: {fileID: 1263112117234136015, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
       propertyPath: m_Model
       value: 
-      objectReference: {fileID: 5022602860645237092, guid: 61df5bd7358ee7a49ae392c782b62a75, type: 3}
+      objectReference: {fileID: 5022602860645237092, guid: 0b3c2ac20a8617e48872f1f0f5f47c88, type: 3}
     - target: {fileID: 1263112117234136015, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
       propertyPath: m_BehaviorType
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 1263112117234136015, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
+      propertyPath: m_BrainParameters.VectorObservationSize
+      value: 454
+      objectReference: {fileID: 0}
     - target: {fileID: 7150799434059154166, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
       propertyPath: m_Model
       value: 
-      objectReference: {fileID: 5022602860645237092, guid: 74abff6a4b79a1446a9006e2173784cb, type: 3}
+      objectReference: {fileID: 5022602860645237092, guid: 51e66df46098a494695437166a8b1edf, type: 3}
     - target: {fileID: 7150799434059154166, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
       propertyPath: m_BehaviorType
       value: 2

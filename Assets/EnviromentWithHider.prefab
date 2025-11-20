@@ -284,10 +284,10 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: c230ff7216a47364a97f1daa935bd276, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 1384525e709b7a141b3ca6226bdd05cf, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
-  m_BehaviorName: HiderV3
+  m_BehaviorName: HiderV5
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
@@ -334,8 +334,9 @@ MonoBehaviour:
     m_Bits: 4294967295
   rewardWhenSeeingSeeker: 0.01
   penaltyWhenSeenBySeeker: -0.02
-  penaltyCaught: -1
+  penaltyCaught: -1000
   boundaryPenalty: -0.1
+  rewardForLiving: 0.001
 --- !u!1 &4161356029315311244
 GameObject:
   m_ObjectHideFlags: 0
@@ -499,10 +500,10 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: 5a5b8ce115c041d47a4eaf7cf393a69f, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 005e88621b355a645a653d218f249161, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
-  m_BehaviorName: SeekerV3
+  m_BehaviorName: SeekerV5
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
