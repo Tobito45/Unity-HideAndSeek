@@ -55,6 +55,11 @@ public class AgentWallsGrid : Agent
     private Dictionary<Vector2Int, CellMemory> gridMemory = new();
     private int gridSize = 15;      // initialized here for simplicity
 
+    // Heatmap variables
+    private Vector2Int? lastKnownHiderCell = null;
+    private float heatmapDecayRate = 0.15f; // How much probability spreads per step
+    private bool hiderCurrentlyVisible = false;
+
     private void Start()
     {
         meshAreaGet = new Mesh();
@@ -69,15 +74,28 @@ public class AgentWallsGrid : Agent
     private void InitializeMemoryGrid()
     {
         gridMemory.Clear();
+        
+        // Initialize uniform probability distribution
+        float uniformProbability = 1.0f / (gridSize * gridSize);
+        
         for (int x = 0; x < 15; x++)
         {
             for (int y = 0; y < 15; y++)
             {
                 Vector2Int cellPos = new Vector2Int(x, y);
                 if (!gridMemory.ContainsKey(cellPos))
-                    gridMemory[cellPos] = new CellMemory() { GridPos = cellPos };
+                {
+                    gridMemory[cellPos] = new CellMemory() 
+                    { 
+                        GridPos = cellPos,
+                        Probability = uniformProbability
+                    };
+                }
             }
         }
+        
+        lastKnownHiderCell = null;
+        hiderCurrentlyVisible = false;
     }
 
     public override void OnEpisodeBegin()
@@ -187,12 +205,17 @@ public class AgentWallsGrid : Agent
                     else if (cell.CellType == CellState.Target) typeValue = 2f;
 
                     float seenValue = cell.HasBeenSeen ? 1f : 0f;
+                    
+                    // Add heatmap probability as observation
+                    float probabilityValue = cell.Probability;
 
                     sensor.AddObservation(typeValue);
                     sensor.AddObservation(seenValue);
+                    sensor.AddObservation(probabilityValue);
                 }
                 else
                 {
+                    sensor.AddObservation(0f);
                     sensor.AddObservation(0f);
                     sensor.AddObservation(0f);
                 }
@@ -224,6 +247,9 @@ public class AgentWallsGrid : Agent
 
         float rotationY = actions.ContinuousActions[2];
         transform.Rotate(Vector3.up, rotationY * rotationSpeed * Time.deltaTime);
+        
+        // Update heatmap every step
+        UpdateHeatmap();
 
         // ===== REWARD STRUCTURE =====
 
@@ -231,9 +257,7 @@ public class AgentWallsGrid : Agent
         //    Encourages agent to solve episode quickly
         AddReward(-0.001f);
 
-        // 2. PROXIMITY REWARD (when target is NOT in sight)
-        //    Encourages agent to search by moving toward target
-        if (!CanSeeTarget() && lastSeenTargetPosition.HasValue)
+        /*if (!CanSeeTarget() && lastSeenTargetPosition.HasValue)
         {
             float distance = Vector3.Distance(transform.localPosition, targetPosition.localPosition);
             float distDelta = previousDistance - distance;
@@ -249,6 +273,22 @@ public class AgentWallsGrid : Agent
             }
 
             previousDistance = distance;
+        }*/
+
+        // 2. EXPLORATION REWARD (when target is NOT in sight)
+        //    Small reward for moving into cells with higher probability of target presence
+        if (!CanSeeTarget() && lastKnownHiderCell.HasValue)
+        {
+            Vector3 floorScale = floorMeshRender.transform.localScale;
+            Vector3 floorPos = floorMeshRender.transform.position;
+            Vector3 origin = floorPos - new Vector3(floorScale.x, 0, floorScale.z) * 0.5f;
+            float cellSize = floorScale.x / gridSize;
+            Vector2Int agentCell = WorldToGridPos(transform.position, origin, cellSize);
+            if (gridMemory.ContainsKey(agentCell))
+            {
+                float cellProbability = gridMemory[agentCell].Probability;
+                AddReward(cellProbability * 0.1f); // Reward proportional to probability
+            }
         }
 
         // 3. VISION REWARD (when target comes into sight)
@@ -277,7 +317,7 @@ public class AgentWallsGrid : Agent
             AddReward(1000f);  // ? Can use either AddReward or SetReward here
                                //   (episode ends immediately after)
             EndEpisode();
-            transform.parent.GetComponentInChildren<AgentHider>().EndEpisode(); 
+            //transform.parent.GetComponentInChildren<AgentHider>().EndEpisode(); uncomment after seeker training
             floorMeshRender.material = winMat;
         }
 
@@ -344,7 +384,7 @@ public class AgentWallsGrid : Agent
         if (other.tag == "Goal")
         {
             // Reward given for reaching target has to be larger than reward obtained during episode run
-            AddReward(200f);  // Smaller reward than vision-based (100, 50, or 300 — adjust based on testing)
+            AddReward(200f);  // Smaller reward than vision-based (100, 50, or 300 ï¿½ adjust based on testing)
             EndEpisode();
             floorMeshRender.material = winMat;
         }
@@ -422,9 +462,20 @@ public class AgentWallsGrid : Agent
             Vector3 center = origin + new Vector3(x * cellSize + cellSize / 2f, 0.01f, z * cellSize + cellSize / 2f);
 
             Color color = Color.gray;
+            
+            // Visualize heatmap probabilities
+            float probability = pair.Value.Probability;
+            // Use red to visualize probability (darker red = higher probability)
+            color = new Color(probability * 5f, 0f, 0f); // Multiply by 5 to make it more visible
+            
+            // Override with special states
             if (pair.Value.CellType == CellState.Wall) color = Color.black;
             else if (pair.Value.CellType == CellState.Target) color = Color.yellow;
-            else if (pair.Value.HasBeenSeen) color = Color.green; //CHANGE COLOR
+            else if (pair.Value.HasBeenSeen) 
+            {
+                // Mix green with heatmap red to show explored areas
+                color = new Color(probability * 5f, 0.3f, 0f);
+            }
 
             Gizmos.color = new Color(color.r, color.g, color.b, 0.3f);
             Gizmos.DrawCube(center, new Vector3(cellSize * 0.95f, 0.01f, cellSize * 0.95f));
@@ -465,6 +516,7 @@ public class AgentWallsGrid : Agent
         float angleStep = viewSeeAngle / (rayCount - 1);
         float startAngle = -viewSeeAngle / 2;
         bool sawGoal = false;
+        Vector2Int? currentHiderCell = null;
 
         float floorScale = floorMeshRender.transform.localScale.x;
         Vector3 origin = floorMeshRender.transform.position - new Vector3(floorScale, 0, floorScale) * 0.5f;
@@ -492,6 +544,7 @@ public class AgentWallsGrid : Agent
                     {
                         gridMemory[cell].CellType = CellState.Target;
                         sawGoal = true;
+                        currentHiderCell = cell;
                     }
                 }
             }
@@ -502,6 +555,20 @@ public class AgentWallsGrid : Agent
             }
 
             MarkCellsOnRayPath(start, end, origin, cellSize);
+        }
+        
+        // Update heatmap based on visibility
+        if (sawGoal && currentHiderCell.HasValue)
+        {
+            // Hider is visible - set that cell to probability 1.0
+            SetHeatmapToCell(currentHiderCell.Value);
+            lastKnownHiderCell = currentHiderCell.Value;
+            hiderCurrentlyVisible = true;
+        }
+        else if (hiderCurrentlyVisible)
+        {
+            // Just lost sight of hider - start diffusion from last known position
+            hiderCurrentlyVisible = false;
         }
 
         return sawGoal;
@@ -567,6 +634,221 @@ public class AgentWallsGrid : Agent
         Vector3 finalPosition = new Vector3(randomCircle.x, center.y, randomCircle.y);
         return finalPosition;
     }
+    
+    // Heatmap Methods
+    
+    private void SetHeatmapToCell(Vector2Int cell)
+    {
+        // Set all probabilities to 0 except the cell where hider is seen
+        foreach (var kvp in gridMemory)
+        {
+            kvp.Value.Probability = 0f;
+        }
+        
+        if (gridMemory.ContainsKey(cell))
+        {
+            gridMemory[cell].Probability = 1.0f;
+        }
+    }
+    
+    private void UpdateHeatmap()
+    {
+        if (hiderCurrentlyVisible) return;
+        if (!lastKnownHiderCell.HasValue) return;
+        
+        // Calculate entropy (uncertainty) before update
+        float entropyBefore = CalculateEntropy();
+        
+        ClearVisibleCellsFromHeatmap();
+        DiffuseHeatmap();
+        NormalizeHeatmap();
+        
+        // Calculate entropy after update
+        float entropyAfter = CalculateEntropy();
+        
+        // Reward for reducing uncertainty (exploring effectively)
+        if (entropyAfter < entropyBefore)
+        {
+            AddReward((entropyBefore - entropyAfter) * 0.5f);
+        }
+    }
+    
+    private float CalculateEntropy()
+    {
+        float entropy = 0f;
+        foreach (var cell in gridMemory.Values)
+        {
+            if (cell.Probability > 0.0001f)
+            {
+                entropy -= cell.Probability * Mathf.Log(cell.Probability);
+            }
+        }
+        return entropy;
+    }
+
+    private void ClearVisibleCellsFromHeatmap()
+    {
+        // For each cell marked as HasBeenSeen in the current field of view,
+        // if we don't see the hider there, set its probability to 0
+        // This simulates: "I can see this area and the hider is NOT here"
+        
+        int rayCount = 20;
+        float angleStep = viewSeeAngle / (rayCount - 1);
+        float startAngle = -viewSeeAngle / 2;
+        
+        float floorScale = floorMeshRender.transform.localScale.x;
+        Vector3 origin = floorMeshRender.transform.position - new Vector3(floorScale, 0, floorScale) * 0.5f;
+        float cellSize = floorScale / gridSize;
+        
+        HashSet<Vector2Int> visibleCells = new HashSet<Vector2Int>();
+        
+        for (int i = 0; i < rayCount; i++)
+        {
+            float currentAngle = startAngle + angleStep * i;
+            Vector3 dir = Quaternion.Euler(0, currentAngle, 0) * transform.forward;
+            Vector3 start = transform.position;
+            Vector3 end;
+            
+            if (Physics.Raycast(start, dir, out RaycastHit hit, viewSeeRadius, obstacleMask))
+            {
+                end = hit.point;
+            }
+            else
+            {
+                end = start + dir * viewSeeRadius;
+            }
+            
+            // Mark all cells along this ray as visible
+            Vector3 delta = end - start;
+            int steps = Mathf.CeilToInt(delta.magnitude / (cellSize * 0.5f));
+            for (int j = 0; j <= steps; j++)
+            {
+                Vector3 point = Vector3.Lerp(start, end, j / (float)steps);
+                Vector2Int cell = WorldToGridPos(point, origin, cellSize);
+                if (gridMemory.ContainsKey(cell))
+                {
+                    visibleCells.Add(cell);
+                }
+            }
+        }
+        
+        // Clear probability from visible cells (since we don't see hider there)
+        foreach (var cell in visibleCells)
+        {
+            if (gridMemory.ContainsKey(cell))
+            {
+                gridMemory[cell].Probability = 0f;
+            }
+        }
+    }
+    
+    private void DiffuseHeatmap()
+    {
+        Dictionary<Vector2Int, float> newProbabilities = new Dictionary<Vector2Int, float>();
+        
+        // Initialize all cells to 0
+        foreach (var key in gridMemory.Keys)
+        {
+            newProbabilities[key] = 0f;
+        }
+        
+        // Diffuse probability from each cell to its neighbors
+        foreach (var kvp in gridMemory)
+        {
+            Vector2Int cell = kvp.Key;
+            float probability = kvp.Value.Probability;
+            
+            if (probability <= 0.0001f) continue; // Skip cells with negligible probability
+            
+            // Get valid neighbors (8-directional movement)
+            List<Vector2Int> neighbors = GetValidNeighbors(cell);
+            
+            if (neighbors.Count == 0) continue;
+            
+            // Keep some probability in current cell, distribute rest to neighbors
+            float retainRate = 1.0f - heatmapDecayRate;
+            float distributeAmount = probability * heatmapDecayRate;
+            float perNeighbor = distributeAmount / neighbors.Count;
+            
+            // Retain probability in current cell
+            newProbabilities[cell] += probability * retainRate;
+            
+            // Distribute to neighbors
+            foreach (var neighbor in neighbors)
+            {
+                if (newProbabilities.ContainsKey(neighbor))
+                {
+                    newProbabilities[neighbor] += perNeighbor;
+                }
+            }
+        }
+        
+        // Update gridMemory with new probabilities
+        foreach (var kvp in newProbabilities)
+        {
+            if (gridMemory.ContainsKey(kvp.Key))
+            {
+                gridMemory[kvp.Key].Probability = kvp.Value;
+            }
+        }
+    }
+    
+    private List<Vector2Int> GetValidNeighbors(Vector2Int cell)
+    {
+        List<Vector2Int> neighbors = new List<Vector2Int>();
+        
+        // 8 directions (including diagonals)
+        Vector2Int[] directions = new Vector2Int[]
+        {
+            new Vector2Int(-1, -1), new Vector2Int(0, -1), new Vector2Int(1, -1),
+            new Vector2Int(-1, 0),                          new Vector2Int(1, 0),
+            new Vector2Int(-1, 1),  new Vector2Int(0, 1),  new Vector2Int(1, 1)
+        };
+        
+        foreach (var dir in directions)
+        {
+            Vector2Int neighbor = cell + dir;
+            
+            // Check if neighbor is within grid bounds and not a wall
+            if (gridMemory.ContainsKey(neighbor))
+            {
+                // Don't diffuse into walls
+                if (gridMemory[neighbor].CellType == CellState.Wall)
+                    continue;
+                    
+                neighbors.Add(neighbor);
+            }
+        }
+        
+        return neighbors;
+    }
+    
+    private void NormalizeHeatmap()
+    {
+        float total = 0f;
+        foreach (var cell in gridMemory.Values)
+        {
+            total += cell.Probability;
+        }
+        
+        if (total > 0.0001f)
+        {
+            // Normalize so total probability = 1.0
+            foreach (var cell in gridMemory.Values)
+            {
+                cell.Probability /= total;
+            }
+        }
+        else
+        {
+            // If all probabilities are 0 (shouldn't happen), reset to uniform
+            float uniformProb = 1.0f / gridMemory.Count;
+            foreach (var cell in gridMemory.Values)
+            {
+                cell.Probability = uniformProb;
+            }
+        }
+    }
 }
 
 public class CellMemory
@@ -574,6 +856,7 @@ public class CellMemory
     public Vector2Int GridPos { get; set; }
     public CellState CellType { get; set; }
     public bool HasBeenSeen { get; set; }
+    public float Probability { get; set; }
 }
 
 public enum CellState
