@@ -67,11 +67,14 @@ public class AgentHider : Agent
         float rot = Mathf.Clamp(actions.ContinuousActions[2], -1f, 1f);
 
         Vector3 move = transform.forward * moveZ + transform.right * moveX;
+        //transform.localPosition += move * moveSpeed * Time.deltaTime;
+        rb.MovePosition(rb.position + move * moveSpeed * Time.deltaTime);
         transform.localPosition = new Vector3(
             Mathf.Clamp(transform.localPosition.x, -10f, 10f),
             transform.localPosition.y,
             Mathf.Clamp(transform.localPosition.z, -10f, 10f)
         );
+
         transform.Rotate(Vector3.up, rot * rotationSpeed * Time.deltaTime);
 
         bool iSeeSeeker = SeekerInMyView();

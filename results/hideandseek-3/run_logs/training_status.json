@@ -1,0 +1,51 @@
+{
+    "SeekerV3": {
+        "checkpoints": [
+            {
+                "steps": 481951,
+                "file_path": "results\\hideandseek-3\\SeekerV3\\SeekerV3-481951.onnx",
+                "reward": 19.712811839724466,
+                "creation_time": 1763110925.6773148,
+                "auxillary_file_paths": [
+                    "results\\hideandseek-3\\SeekerV3\\SeekerV3-481951.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 481951,
+            "file_path": "results\\hideandseek-3\\SeekerV3.onnx",
+            "reward": 19.712811839724466,
+            "creation_time": 1763110925.6773148,
+            "auxillary_file_paths": [
+                "results\\hideandseek-3\\SeekerV3\\SeekerV3-481951.pt"
+            ]
+        }
+    },
+    "HiderV3": {
+        "checkpoints": [
+            {
+                "steps": 482097,
+                "file_path": "results\\hideandseek-3\\HiderV3\\HiderV3-482097.onnx",
+                "reward": -0.024444445967674255,
+                "creation_time": 1763110925.8384097,
+                "auxillary_file_paths": [
+                    "results\\hideandseek-3\\HiderV3\\HiderV3-482097.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 482097,
+            "file_path": "results\\hideandseek-3\\HiderV3.onnx",
+            "reward": -0.024444445967674255,
+            "creation_time": 1763110925.8384097,
+            "auxillary_file_paths": [
+                "results\\hideandseek-3\\HiderV3\\HiderV3-482097.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cu121"
+    }
+}
