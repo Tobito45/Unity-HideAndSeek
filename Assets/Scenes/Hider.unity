@@ -2213,7 +2213,11 @@ PrefabInstance:
     - target: {fileID: 1263112117234136015, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
       propertyPath: m_Model
       value: 
-      objectReference: {fileID: 5022602860645237092, guid: 0b3c2ac20a8617e48872f1f0f5f47c88, type: 3}
+      objectReference: {fileID: 5022602860645237092, guid: 005e88621b355a645a653d218f249161, type: 3}
+    - target: {fileID: 1263112117234136015, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
+      propertyPath: m_BehaviorName
+      value: A_03
+      objectReference: {fileID: 0}
     - target: {fileID: 1263112117234136015, guid: d5f7a656f9a9b6f46881ef4e99b7cc49, type: 3}
       propertyPath: m_BehaviorType
       value: 2
