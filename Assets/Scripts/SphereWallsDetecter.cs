@@ -12,7 +12,7 @@ public class SphereWallsDetecter : MonoBehaviour
     {
         if (other.gameObject.CompareTag("LocalWall"))
         {
-            _agentGridWalls?.ResetWalls();
+            //_agentGridWalls?.ResetWalls();
             _agentWalls?.ResetWalls();
         }
     }

@@ -150,6 +150,14 @@ public class AgentHider : Agent
             AddReward(-0.005f);
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Wall"))
+        {
+            AddReward(boundaryPenalty);
+        }
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
