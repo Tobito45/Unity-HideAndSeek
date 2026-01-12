@@ -699,7 +699,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -768,7 +768,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: 57cfe17312e74ab40983b6f27fb05f3c, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: f6e5f21dca976c04bbfa04cd4d494155, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: Hider2V1
@@ -816,11 +816,13 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  rewardWhenSeeingSeeker: 0.01
-  penaltyWhenSeenBySeeker: -0.02
-  penaltyCaught: -1000
-  boundaryPenalty: -100000
-  rewardForLiving: 0.001
+  escapeRewardScale: 0.05
+  closePenaltyScale: 0.08
+  seenPenalty: -0.05
+  caughtPenalty: -1
+  idlePenalty: -0.001
+  dangerDistance: 5
+  catchDistance: 2
 --- !u!1 &4950205459354583116
 GameObject:
   m_ObjectHideFlags: 0
@@ -1340,9 +1342,9 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: 0a81836ff8caa4d4c9a9457e2647994e, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 12f314c254c24d44797629bb9bec585a, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 2
+  m_BehaviorType: 0
   m_BehaviorName: Seeker2V1
   TeamId: 0
   m_UseChildSensors: 1

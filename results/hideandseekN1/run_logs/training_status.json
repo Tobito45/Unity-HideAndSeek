@@ -1,0 +1,69 @@
+{
+    "Hider2V1": {
+        "checkpoints": [
+            {
+                "steps": 499906,
+                "file_path": "results\\hideandseekN1\\Hider2V1\\Hider2V1-499906.onnx",
+                "reward": -0.1801485334123884,
+                "creation_time": 1768142098.1267612,
+                "auxillary_file_paths": [
+                    "results\\hideandseekN1\\Hider2V1\\Hider2V1-499906.pt"
+                ]
+            },
+            {
+                "steps": 857992,
+                "file_path": "results\\hideandseekN1\\Hider2V1\\Hider2V1-857992.onnx",
+                "reward": -0.27243855595588684,
+                "creation_time": 1768143903.7461796,
+                "auxillary_file_paths": [
+                    "results\\hideandseekN1\\Hider2V1\\Hider2V1-857992.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 857992,
+            "file_path": "results\\hideandseekN1\\Hider2V1.onnx",
+            "reward": -0.27243855595588684,
+            "creation_time": 1768143903.7461796,
+            "auxillary_file_paths": [
+                "results\\hideandseekN1\\Hider2V1\\Hider2V1-857992.pt"
+            ]
+        }
+    },
+    "Seeker2V1": {
+        "checkpoints": [
+            {
+                "steps": 499997,
+                "file_path": "results\\hideandseekN1\\Seeker2V1\\Seeker2V1-499997.onnx",
+                "reward": null,
+                "creation_time": 1768142099.472887,
+                "auxillary_file_paths": [
+                    "results\\hideandseekN1\\Seeker2V1\\Seeker2V1-499997.pt"
+                ]
+            },
+            {
+                "steps": 857321,
+                "file_path": "results\\hideandseekN1\\Seeker2V1\\Seeker2V1-857321.onnx",
+                "reward": null,
+                "creation_time": 1768143903.5965087,
+                "auxillary_file_paths": [
+                    "results\\hideandseekN1\\Seeker2V1\\Seeker2V1-857321.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 857321,
+            "file_path": "results\\hideandseekN1\\Seeker2V1.onnx",
+            "reward": null,
+            "creation_time": 1768143903.5965087,
+            "auxillary_file_paths": [
+                "results\\hideandseekN1\\Seeker2V1\\Seeker2V1-857321.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cu121"
+    }
+}

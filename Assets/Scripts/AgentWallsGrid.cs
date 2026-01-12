@@ -539,6 +539,21 @@ public class AgentWallsGrid : Agent
         }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Goal")
+        {
+            AddReward(catchReward);
+            EndEpisode();
+            floorMeshRender.material = winMat;
+
+            var hider = FindObjectOfType<AgentHider>();
+            if (hider != null)
+                hider.EndEpisode();
+
+        }
+    }
+
     // -----------------------------
     // Utilities: grid <-> world
     // -----------------------------
