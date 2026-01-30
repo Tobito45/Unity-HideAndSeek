@@ -301,7 +301,7 @@ public class AgentWallsGrid : Agent
             floorMeshRender.material = winMat;
             // If you want to also end hider, find and end it here (example):
             var hider = Object.FindObjectOfType<AgentHider>();
-            if (hider != null) hider.EndEpisode();
+            if (hider != null) hider.WasCaught();
         }
     }
 
@@ -534,7 +534,7 @@ public class AgentWallsGrid : Agent
 
             var hider = FindObjectOfType<AgentHider>();
             if (hider != null)
-                hider.EndEpisode();
+                hider.WasCaught();
 
         }
     }
@@ -549,7 +549,7 @@ public class AgentWallsGrid : Agent
 
             var hider = FindObjectOfType<AgentHider>();
             if (hider != null)
-                hider.EndEpisode();
+                hider.WasCaught();
 
         }
     }

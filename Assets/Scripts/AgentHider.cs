@@ -3,58 +3,61 @@ using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
 
+//rb.constraints =
+//    RigidbodyConstraints.FreezeRotationX |
+//    RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezePositionY;
+
 public class AgentHider : Agent
 {
     [Header("Movement")]
-    [SerializeField] private float moveSpeed = 6f;
-    [SerializeField] private float rotationSpeed = 120f;
+    public float moveSpeed = 6f;
+    public float rotationSpeed = 120f;
 
     [Header("References")]
     public Transform seekerTransform;
 
-    [Header("View")]
-    public float viewRadius = 8f;
-    [Range(0, 360)] public float viewAngle = 100f;
-    public LayerMask obstacleMask;
-
-    [Header("Distances")]
-    public float dangerDistance = 5f;
+    [Header("Stealth distances")]
+    public float dangerDistance = 6f;
     public float catchDistance = 2f;
 
     [Header("Rewards")]
-    public float escapeRewardScale = 0.05f;
-    public float closePenaltyScale = 0.08f;
-    public float seenPenalty = -0.05f;
-    public float caughtPenalty = -1.0f;
-    public float idlePenalty = -0.001f;
+    public float distanceRewardScale = 0.05f;
+    public float fovPenaltyScale = 0.08f;
+    public float idlePenalty = -0.002f;
+    public float caughtPenalty = -1f;
 
     [Header("Debug")]
-    [SerializeField] private bool drawDebugRays = true;
-    [SerializeField] private bool drawGizmos = true;
+    public bool drawGizmos = true;
 
     private Rigidbody rb;
-    private float prevDist;
-    private Vector3 prevPos;
+    private Vector3 lastPos;
+    private float prevDistance;
 
     // =============================
     // Episode
     // =============================
     public override void OnEpisodeBegin()
     {
-        if (rb == null) rb = GetComponent<Rigidbody>();
+        if (rb == null)
+            rb = GetComponent<Rigidbody>();
+
+        rb.constraints =
+            RigidbodyConstraints.FreezeRotationX |
+            RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezePositionY;
+
 
         transform.localPosition = new Vector3(
-            Random.Range(-3f, 3f),
+            Random.Range(-4f, 4f),
             transform.localPosition.y,
-            Random.Range(-3f, 3f)
+            Random.Range(-4f, 4f)
         );
         transform.localRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
 
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 
-        prevDist = Vector3.Distance(transform.position, seekerTransform.position);
-        prevPos = transform.position;
+        lastPos = transform.position;
+        prevDistance = Vector3.Distance(transform.position, seekerTransform.position);
     }
 
     // =============================
@@ -62,23 +65,34 @@ public class AgentHider : Agent
     // =============================
     public override void CollectObservations(VectorSensor sensor)
     {
-        // position
-        sensor.AddObservation(transform.localPosition.x / 10f);
-        sensor.AddObservation(transform.localPosition.z / 10f);
-
-        // direction and distance to seeker
+        // --- relative position to seeker (flat)
         Vector3 toSeeker = seekerTransform.position - transform.position;
-        sensor.AddObservation(toSeeker.x / 10f);
-        sensor.AddObservation(toSeeker.z / 10f);
-        sensor.AddObservation(Mathf.Clamp01(toSeeker.magnitude / 10f));
+        Vector3 toSeekerFlat = Vector3.ProjectOnPlane(toSeeker, Vector3.up);
 
-        // orientation
-        float a = transform.eulerAngles.y * Mathf.Deg2Rad;
-        sensor.AddObservation(Mathf.Cos(a));
-        sensor.AddObservation(Mathf.Sin(a));
+        sensor.AddObservation(toSeekerFlat.x / 10f);
+        sensor.AddObservation(toSeekerFlat.z / 10f);
+        sensor.AddObservation(Mathf.Clamp01(toSeekerFlat.magnitude / 10f));
 
-        // is seen by seeker
-        sensor.AddObservation(IsSeenBySeeker(false) ? 1f : 0f);
+        // --- seeker forward (flat)
+        Vector3 seekerForward = Vector3.ProjectOnPlane(seekerTransform.forward, Vector3.up).normalized;
+        sensor.AddObservation(seekerForward.x);
+        sensor.AddObservation(seekerForward.z);
+
+        // --- how centered I am in seeker's FOV (-1 ... 1)
+        Vector3 toHiderFromSeeker = (transform.position - seekerTransform.position);
+        Vector3 toHiderFlat = Vector3.ProjectOnPlane(toHiderFromSeeker, Vector3.up).normalized;
+        float fovDot = Vector3.Dot(seekerForward, toHiderFlat);
+        sensor.AddObservation(fovDot);
+
+        // --- my velocity (flat)
+        Vector3 vel = Vector3.ProjectOnPlane(rb.linearVelocity, Vector3.up);
+        sensor.AddObservation(vel.x / moveSpeed);
+        sensor.AddObservation(vel.z / moveSpeed);
+
+        // --- my orientation
+        float ang = transform.eulerAngles.y * Mathf.Deg2Rad;
+        sensor.AddObservation(Mathf.Cos(ang));
+        sensor.AddObservation(Mathf.Sin(ang));
     }
 
     // =============================
@@ -90,98 +104,45 @@ public class AgentHider : Agent
         float moveZ = Mathf.Clamp(actions.ContinuousActions[1], -1f, 1f);
         float rot = Mathf.Clamp(actions.ContinuousActions[2], -1f, 1f);
 
-        Vector3 move = transform.forward * moveZ + transform.right * moveX;
+        Vector3 move = transform.right * moveX + transform.forward * moveZ;
         rb.MovePosition(rb.position + move * moveSpeed * Time.deltaTime);
         rb.MoveRotation(rb.rotation * Quaternion.Euler(0f, rot * rotationSpeed * Time.deltaTime, 0f));
 
+        // =============================
+        // Stealth rewards
+        // =============================
+
         float curDist = Vector3.Distance(transform.position, seekerTransform.position);
+        float deltaDist = curDist - prevDistance;
 
-        // === 1. Reward only for actual escaping
-        float delta = curDist - prevDist;
-        if (delta > 0f)
-            AddReward(delta * escapeRewardScale);
-        else
-            AddReward(delta * escapeRewardScale * 2f);
+        // 1. reward for increasing distance
+        AddReward(deltaDist * distanceRewardScale);
 
-        // === 2. Exponential fear of proximity
-        float danger = Mathf.Clamp01(1f - curDist / dangerDistance);
-        AddReward(-danger * danger * closePenaltyScale);
+        // 2. penalty for being in seeker's FOV center
+        Vector3 seekerForward = Vector3.ProjectOnPlane(seekerTransform.forward, Vector3.up).normalized;
+        Vector3 toHider = Vector3.ProjectOnPlane(
+            transform.position - seekerTransform.position,
+            Vector3.up
+        ).normalized;
 
-        // === 3. Penalty for idling
-        if (Vector3.Distance(transform.position, prevPos) < 0.01f)
+        float fovDot = Vector3.Dot(seekerForward, toHider); // 1 = center
+        float fovDanger = Mathf.Clamp01((fovDot + 1f) * 0.5f);
+        AddReward(-fovDanger * fovPenaltyScale);
+
+        // 3. idle penalty
+        if (Vector3.Distance(transform.position, lastPos) < 0.01f)
             AddReward(idlePenalty);
 
-        // === 4. If seeker sees — penalty
-        if (IsSeenBySeeker(true))
-            AddReward(seenPenalty);
-
-        // === 5. Caught
-        if (curDist < catchDistance && IsSeenBySeeker(true))
+        // 4. caught
+        if (curDist < catchDistance && fovDot > 0.7f)
         {
             AddReward(caughtPenalty);
             EndEpisode();
+            transform.parent.GetComponentInChildren<AgentWallsGrid>().EndEpisode();
         }
 
-        // Debug rays
-        if (drawDebugRays)
-        {
-            IsSeenBySeeker(true);
-            HiderSeesSeeker(true);
-        }
-
-        prevDist = curDist;
-        prevPos = transform.position;
-    }
-
-    // =============================
-    // Vision
-    // =============================
-    private bool IsSeenBySeeker(bool draw)
-    {
-        Vector3 toHider = transform.position - seekerTransform.position;
-        float dist = toHider.magnitude;
-
-        if (dist > 10f) return false;
-        if (Vector3.Angle(seekerTransform.forward, toHider.normalized) > 45f) return false;
-
-        Vector3 origin = seekerTransform.position + Vector3.up * 0.3f;
-
-        if (Physics.Raycast(origin, toHider.normalized, out RaycastHit hit, dist, obstacleMask))
-        {
-            if (draw && drawDebugRays)
-                Debug.DrawRay(origin, toHider.normalized * hit.distance, Color.green);
-            return false;
-        }
-        else
-        {
-            if (draw && drawDebugRays)
-                Debug.DrawRay(origin, toHider.normalized * dist, Color.red);
-            return true;
-        }
-    }
-
-    private bool HiderSeesSeeker(bool draw)
-    {
-        Vector3 toSeeker = seekerTransform.position - transform.position;
-        float dist = toSeeker.magnitude;
-
-        if (dist > viewRadius) return false;
-        if (Vector3.Angle(transform.forward, toSeeker.normalized) > viewAngle / 2f) return false;
-
-        Vector3 origin = transform.position + Vector3.up * 0.3f;
-
-        if (Physics.Raycast(origin, toSeeker.normalized, out RaycastHit hit, dist, obstacleMask))
-        {
-            if (draw && drawDebugRays)
-                Debug.DrawRay(origin, toSeeker.normalized * hit.distance, Color.gray);
-            return false;
-        }
-        else
-        {
-            if (draw && drawDebugRays)
-                Debug.DrawRay(origin, toSeeker.normalized * dist, Color.cyan);
-            return true;
-        }
+        prevDistance = curDist;
+        lastPos = transform.position;
     }
 
     // =============================
@@ -189,29 +150,34 @@ public class AgentHider : Agent
     // =============================
     private void OnDrawGizmos()
     {
-        if (!drawGizmos) return;
+        if (!drawGizmos || seekerTransform == null)
+            return;
 
         // danger radius
-        Gizmos.color = new Color(1f, 0f, 0f, 0.2f);
+        Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, dangerDistance);
 
-        // view cone
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, viewRadius);
+        // line to seeker
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, seekerTransform.position);
 
-        Vector3 a = DirFromAngle(-viewAngle / 2);
-        Vector3 b = DirFromAngle(viewAngle / 2);
-        Gizmos.DrawLine(transform.position, transform.position + a * viewRadius);
-        Gizmos.DrawLine(transform.position, transform.position + b * viewRadius);
+        // seeker forward
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawLine(
+            seekerTransform.position,
+            seekerTransform.position + seekerTransform.forward * 3f
+        );
     }
 
-    private Vector3 DirFromAngle(float angle)
+    public void WasCaught()
     {
-        angle += transform.eulerAngles.y;
-        return new Vector3(Mathf.Sin(angle * Mathf.Deg2Rad), 0f, Mathf.Cos(angle * Mathf.Deg2Rad));
+        AddReward(caughtPenalty);
+        EndEpisode();
     }
 
-
+    // =============================
+    // Wall = death
+    // =============================
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.CompareTag("Wall"))
@@ -219,10 +185,10 @@ public class AgentHider : Agent
             AddReward(caughtPenalty);
             EndEpisode();
 
-            FindAnyObjectByType<AgentWallsGrid>().EndEpisode();
+            transform.parent.GetComponentInChildren<AgentWallsGrid>().EndEpisode();
         }
-            //AddReward(-0.01f);
     }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Wall"))
@@ -230,7 +196,7 @@ public class AgentHider : Agent
             AddReward(caughtPenalty);
             EndEpisode();
 
-            FindAnyObjectByType<AgentWallsGrid>().EndEpisode();
+            transform.parent.GetComponentInChildren<AgentWallsGrid>().EndEpisode();
         }
     }
 }

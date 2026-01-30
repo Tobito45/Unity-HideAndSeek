@@ -1,0 +1,105 @@
+{
+    "Seeker2V1": {
+        "checkpoints": [
+            {
+                "steps": 365076,
+                "file_path": "results\\hideandseekNNH-4\\Seeker2V1\\Seeker2V1-365076.onnx",
+                "reward": 463.09864607539527,
+                "creation_time": 1769084015.8163934,
+                "auxillary_file_paths": [
+                    "results\\hideandseekNNH-4\\Seeker2V1\\Seeker2V1-365076.pt"
+                ]
+            },
+            {
+                "steps": 468648,
+                "file_path": "results\\hideandseekNNH-4\\Seeker2V1\\Seeker2V1-468648.onnx",
+                "reward": 999.9195251464844,
+                "creation_time": 1769084698.0692036,
+                "auxillary_file_paths": [
+                    "results\\hideandseekNNH-4\\Seeker2V1\\Seeker2V1-468648.pt"
+                ]
+            },
+            {
+                "steps": 499993,
+                "file_path": "results\\hideandseekNNH-4\\Seeker2V1\\Seeker2V1-499993.onnx",
+                "reward": 511.58840011552803,
+                "creation_time": 1769084923.6936548,
+                "auxillary_file_paths": [
+                    "results\\hideandseekNNH-4\\Seeker2V1\\Seeker2V1-499993.pt"
+                ]
+            },
+            {
+                "steps": 953029,
+                "file_path": "results\\hideandseekNNH-4\\Seeker2V1\\Seeker2V1-953029.onnx",
+                "reward": 750.7014389307005,
+                "creation_time": 1769087402.056385,
+                "auxillary_file_paths": [
+                    "results\\hideandseekNNH-4\\Seeker2V1\\Seeker2V1-953029.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 953029,
+            "file_path": "results\\hideandseekNNH-4\\Seeker2V1.onnx",
+            "reward": 750.7014389307005,
+            "creation_time": 1769087402.056385,
+            "auxillary_file_paths": [
+                "results\\hideandseekNNH-4\\Seeker2V1\\Seeker2V1-953029.pt"
+            ]
+        }
+    },
+    "Hider2V2": {
+        "checkpoints": [
+            {
+                "steps": 364626,
+                "file_path": "results\\hideandseekNNH-4\\Hider2V2\\Hider2V2-364626.onnx",
+                "reward": -5.999378847235695,
+                "creation_time": 1769084016.1250806,
+                "auxillary_file_paths": [
+                    "results\\hideandseekNNH-4\\Hider2V2\\Hider2V2-364626.pt"
+                ]
+            },
+            {
+                "steps": 467269,
+                "file_path": "results\\hideandseekNNH-4\\Hider2V2\\Hider2V2-467269.onnx",
+                "reward": null,
+                "creation_time": 1769084697.9374738,
+                "auxillary_file_paths": [
+                    "results\\hideandseekNNH-4\\Hider2V2\\Hider2V2-467269.pt"
+                ]
+            },
+            {
+                "steps": 499909,
+                "file_path": "results\\hideandseekNNH-4\\Hider2V2\\Hider2V2-499909.onnx",
+                "reward": -6.0458175361156465,
+                "creation_time": 1769084940.5874767,
+                "auxillary_file_paths": [
+                    "results\\hideandseekNNH-4\\Hider2V2\\Hider2V2-499909.pt"
+                ]
+            },
+            {
+                "steps": 950476,
+                "file_path": "results\\hideandseekNNH-4\\Hider2V2\\Hider2V2-950476.onnx",
+                "reward": -6.040911176653677,
+                "creation_time": 1769087401.8780572,
+                "auxillary_file_paths": [
+                    "results\\hideandseekNNH-4\\Hider2V2\\Hider2V2-950476.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 950476,
+            "file_path": "results\\hideandseekNNH-4\\Hider2V2.onnx",
+            "reward": -6.040911176653677,
+            "creation_time": 1769087401.8780572,
+            "auxillary_file_paths": [
+                "results\\hideandseekNNH-4\\Hider2V2\\Hider2V2-950476.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cu121"
+    }
+}

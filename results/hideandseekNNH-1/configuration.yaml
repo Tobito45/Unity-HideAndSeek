@@ -1,99 +1,95 @@
 default_settings: null
-
 behaviors:
   Seeker2V1:
     trainer_type: ppo
     hyperparameters:
       batch_size: 128
       buffer_size: 4096
-      learning_rate: 3.0e-4
-      beta: 5.0e-4
+      learning_rate: 0.0003
+      beta: 0.0005
       epsilon: 0.2
       lambd: 0.99
       num_epoch: 3
+      shared_critic: false
       learning_rate_schedule: linear
       beta_schedule: constant
       epsilon_schedule: linear
+    checkpoint_interval: 500000
     network_settings:
       normalize: true
       hidden_units: 256
       num_layers: 2
       vis_encode_type: simple
+      memory: null
       goal_conditioning_type: none
       deterministic: false
-    reward_signals:
-      extrinsic:
-        gamma: 0.99
-        strength: 1.0
-    init_path: null
-    keep_checkpoints: 5
-    max_steps: 5_000_000
-    time_horizon: 128
-    summary_freq: 50_000
-  Hider2V1:
-    trainer_type: ppo
-    hyperparameters:
-      batch_size: 128
-      buffer_size: 4096
-      learning_rate: 3.0e-4
-      beta: 5.0e-4
-      epsilon: 0.2
-      lambd: 0.99
-      num_epoch: 3
-      learning_rate_schedule: linear
-      beta_schedule: constant
-      epsilon_schedule: linear
-    network_settings:
-      normalize: true
-      hidden_units: 256
-      num_layers: 2
-      memory:
-        sequence_length: 64
-        memory_size: 128
-      vis_encode_type: simple
-      goal_conditioning_type: none
-      deterministic: false
-    reward_signals:
-      extrinsic:
-        gamma: 0.99
-        strength: 1.0
-    init_path: null
-    keep_checkpoints: 5
-    max_steps: 5_000_000
-    time_horizon: 128
-    summary_freq: 50_000
-  Hider2V2:
-    trainer_type: ppo
-    hyperparameters:
-      batch_size: 256
-      buffer_size: 16384
-      learning_rate: 2.0e-4
-      beta: 0.003
-      epsilon: 0.2
-      lambd: 0.99
-      num_epoch: 3
-      shared_critic: true
-      learning_rate_schedule: linear
-      beta_schedule: linear
-      epsilon_schedule: linear
-    network_settings:
-      normalize: true
-      hidden_units: 256
-      num_layers: 3
-      memory:
-        sequence_length: 128
-        memory_size: 256
     reward_signals:
       extrinsic:
         gamma: 0.99
         strength: 1.0
         network_settings:
-          normalize: true
-          hidden_units: 256
-          num_layers: 3
-    max_steps: 8000000
-    time_horizon: 256
-    summary_freq: 25000
+          normalize: false
+          hidden_units: 128
+          num_layers: 2
+          vis_encode_type: simple
+          memory: null
+          goal_conditioning_type: hyper
+          deterministic: false
+    init_path: null
+    keep_checkpoints: 5
+    even_checkpoints: false
+    max_steps: 5000000
+    time_horizon: 128
+    summary_freq: 50000
+    threaded: false
+    self_play: null
+    behavioral_cloning: null
+  Hider2V1:
+    trainer_type: ppo
+    hyperparameters:
+      batch_size: 128
+      buffer_size: 4096
+      learning_rate: 0.0003
+      beta: 0.0005
+      epsilon: 0.2
+      lambd: 0.99
+      num_epoch: 3
+      shared_critic: false
+      learning_rate_schedule: linear
+      beta_schedule: constant
+      epsilon_schedule: linear
+    checkpoint_interval: 500000
+    network_settings:
+      normalize: true
+      hidden_units: 256
+      num_layers: 2
+      vis_encode_type: simple
+      memory:
+        sequence_length: 64
+        memory_size: 128
+      goal_conditioning_type: none
+      deterministic: false
+    reward_signals:
+      extrinsic:
+        gamma: 0.99
+        strength: 1.0
+        network_settings:
+          normalize: false
+          hidden_units: 128
+          num_layers: 2
+          vis_encode_type: simple
+          memory: null
+          goal_conditioning_type: hyper
+          deterministic: false
+    init_path: null
+    keep_checkpoints: 5
+    even_checkpoints: false
+    max_steps: 5000000
+    time_horizon: 128
+    summary_freq: 50000
+    threaded: false
+    self_play: null
+    behavioral_cloning: null
 env_settings:
   env_path: null
   env_args: null
@@ -102,16 +98,21 @@ env_settings:
   num_areas: 1
   timeout_wait: 60
   seed: -1
+  max_lifetime_restarts: 10
+  restarts_rate_limit_n: 1
+  restarts_rate_limit_period_s: 60
 engine_settings:
   width: 84
   height: 84
   quality_level: 5
-  time_scale: 20
+  time_scale: 20.0
   target_frame_rate: -1
   capture_frame_rate: 60
   no_graphics: false
+  no_graphics_monitor: false
+environment_parameters: null
 checkpoint_settings:
-  run_id: SeekerHiderV1
+  run_id: hideandseekNNH-1
   initialize_from: null
   load_model: false
   resume: false
@@ -119,3 +120,6 @@ checkpoint_settings:
   train_model: true
   inference: false
   results_dir: results
+torch_settings:
+  device: null
+debug: false

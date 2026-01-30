@@ -730,7 +730,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 36
+  m_Constraints: 84
   m_CollisionDetection: 0
 --- !u!114 &6048523902773728011
 MonoBehaviour:
@@ -759,7 +759,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 6
+    VectorObservationSize: 10
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 3
@@ -768,10 +768,10 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: f6e5f21dca976c04bbfa04cd4d494155, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: abba5461e7f155c43b1f9db41ea3f03e, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
-  m_BehaviorName: Hider2V1
+  m_BehaviorName: Hider2V2
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
@@ -808,21 +808,16 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 3000
-  moveSpeed: 6
-  rotationSpeed: 120
+  moveSpeed: 24
+  rotationSpeed: 480
   seekerTransform: {fileID: 5165744750236646004}
-  viewRadius: 8
-  viewAngle: 100
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  escapeRewardScale: 0.05
-  closePenaltyScale: 0.08
-  seenPenalty: -0.05
-  caughtPenalty: -1
+  dangerDistance: 4
+  catchDistance: 0.5
+  distanceRewardScale: 0.05
+  fovPenaltyScale: 0.08
   idlePenalty: -0.001
-  dangerDistance: 5
-  catchDistance: 2
+  caughtPenalty: -5
+  drawGizmos: 1
 --- !u!1 &4950205459354583116
 GameObject:
   m_ObjectHideFlags: 0
@@ -1342,7 +1337,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: 12f314c254c24d44797629bb9bec585a, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: ba4eb76037008964ba1da0dc3d0078de, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: Seeker2V1

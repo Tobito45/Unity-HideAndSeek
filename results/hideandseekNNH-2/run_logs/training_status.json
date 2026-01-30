@@ -1,0 +1,29 @@
+{
+    "Hider2V2": {
+        "checkpoints": [
+            {
+                "steps": 84179,
+                "file_path": "results\\hideandseekNNH-2\\Hider2V2\\Hider2V2-84179.onnx",
+                "reward": -3.62667090683193,
+                "creation_time": 1769033788.5451484,
+                "auxillary_file_paths": [
+                    "results\\hideandseekNNH-2\\Hider2V2\\Hider2V2-84179.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 84179,
+            "file_path": "results\\hideandseekNNH-2\\Hider2V2.onnx",
+            "reward": -3.62667090683193,
+            "creation_time": 1769033788.5451484,
+            "auxillary_file_paths": [
+                "results\\hideandseekNNH-2\\Hider2V2\\Hider2V2-84179.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cu121"
+    }
+}
