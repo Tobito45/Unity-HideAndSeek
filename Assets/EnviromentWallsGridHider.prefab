@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7895770388846660453}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Wall
+  m_TagString: LocalWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -102,11 +102,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1.33, y: 30.86, z: 1.32}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &543523346624000515
 GameObject:
@@ -381,7 +381,7 @@ GameObject:
   - component: {fileID: 2267911821089764190}
   m_Layer: 0
   m_Name: Cube (4)
-  m_TagString: Wall
+  m_TagString: LocalWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -469,11 +469,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1.33, y: 30.86, z: 1.32}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1374910678758503941
 GameObject:
@@ -768,7 +768,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: abba5461e7f155c43b1f9db41ea3f03e, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 71cc13cad6ea1ed4083aa5936d11bb31, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: Hider2V2
@@ -971,7 +971,7 @@ GameObject:
   - component: {fileID: 2894891522442360893}
   m_Layer: 0
   m_Name: Cube (2)
-  m_TagString: Wall
+  m_TagString: LocalWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1059,11 +1059,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1.33, y: 30.86, z: 1.32}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5831032338316162184
 GameObject:
@@ -1079,7 +1079,7 @@ GameObject:
   - component: {fileID: 2350510001838424087}
   m_Layer: 0
   m_Name: Cube (1)
-  m_TagString: Wall
+  m_TagString: LocalWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1167,11 +1167,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1.33, y: 30.86, z: 1.32}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6383266918858421034
 GameObject:
@@ -1337,7 +1337,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: ba4eb76037008964ba1da0dc3d0078de, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 5db2bd2aa64d29a498d4b3e86034adbc, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: Seeker2V1
@@ -1431,7 +1431,7 @@ GameObject:
   - component: {fileID: 9031800650350934854}
   m_Layer: 0
   m_Name: Cube (7)
-  m_TagString: Wall
+  m_TagString: LocalWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1519,11 +1519,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1.33, y: 30.86, z: 1.32}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7344580985406267359
 GameObject:
@@ -1539,7 +1539,7 @@ GameObject:
   - component: {fileID: 7263985468788325202}
   m_Layer: 0
   m_Name: Cube (5)
-  m_TagString: Wall
+  m_TagString: LocalWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1627,11 +1627,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1.33, y: 30.86, z: 1.32}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7566523336334249232
 GameObject:
@@ -1683,7 +1683,7 @@ GameObject:
   - component: {fileID: 2079470427800842080}
   m_Layer: 0
   m_Name: Cube (3)
-  m_TagString: Wall
+  m_TagString: LocalWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1771,11 +1771,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1.33, y: 30.86, z: 1.32}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &9203940269770414044
 GameObject:
@@ -1791,7 +1791,7 @@ GameObject:
   - component: {fileID: 3602090666927029841}
   m_Layer: 0
   m_Name: Cube (6)
-  m_TagString: Wall
+  m_TagString: LocalWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1879,9 +1879,9 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1.33, y: 30.86, z: 1.32}
   m_Center: {x: 0, y: 0, z: 0}
